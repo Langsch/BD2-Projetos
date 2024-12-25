@@ -10,7 +10,7 @@ Este repositório é utilizado para armazenar e compartilhar projetos e atividad
 
 ## Objetivo
 
-O objetivo deste repositório é fornecer um local centralizado para armazenar e compartilhar projetos de banco de dados, permitindo que os alunos e professores da disciplina possam acessar e aprender com os trabalhos desenvolvidos.
+O objetivo deste repositório é fornecer um local centralizado para armazenar e compartilhar projetos de banco de dados, permitindo que os integrantes dos grupo possam compartilhar e armazenar as atividades
 
 ## Contribuição
 
