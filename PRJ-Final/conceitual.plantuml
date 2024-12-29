@@ -1,163 +1,167 @@
 @startuml Biblioteca
-    class Livro {
-        -ISBN: String
-        -titulo: String
-        -ano_publicacao: Date
-        -edicao: String
-        -idioma: String
-        -num_paginas: Integer
-        -formato: String
-        -sinopse: Text
-        -capa_url: String
-    }
 
-    class AcervoDigital {
-        -titulo: String
-        -formato: String
-        -url: String
-        -tamanho: Integer
-        -licenca: String
-        -requisitos: Text
-    }
+class Livro {
+    -ISBN: String
+    -titulo: String
+    -ano_publicacao: Date
+    -edicao: String
+    -idioma: String
+    -num_paginas: Integer
+    -formato: String
+    -sinopse: Text
+    -capa_url: String
+}
 
-    class Exemplar {
-        -codigo: String
-        -status: String
-        -data_aquisicao: Date
-        -condicao: String
-        -localizacao: String
-        -tipo_aquisicao: String
-    }
+class AcervoDigital {
+    -titulo: String
+    -formato: String
+    -url: String
+    -tamanho: Integer
+    -licenca: String
+    -requisitos: Text
+}
 
-    class Autor {
-        -nome: String
-        -biografia: Text
-        -data_nascimento: Date
-        -nacionalidade: String
-        -pseudonimo: String
-    }
+class Exemplar {
+    -codigo: String
+    -status: String
+    -data_aquisicao: Date
+    -condicao: String
+    -localizacao: String
+    -tipo_aquisicao: String
+}
 
-    class Editora {
-        -nome: String
-        -cnpj: String
-        -endereco: String
-        -telefone: String
-        -email: String
-        -website: String
-    }
+class Autor {
+    -nome: String
+    -biografia: Text
+    -data_nascimento: Date
+    -nacionalidade: String
+    -pseudonimo: String
+}
 
-    class Categoria {
-        -nome: String
-        -descricao: Text
-        -categoria_pai: Integer
-    }
+class Editora {
+    -nome: String
+    -cnpj: String
+    -endereco: String
+    -telefone: String
+    -email: String
+    -website: String
+}
 
-    class Usuario {
-        -nome: String
-        -cpf: String
-        -email: String
-        -telefone: String
-        -endereco: String
-        -data_nascimento: Date
-        -tipo_usuario: String
-        -status: String
-    }
+class Categoria {
+    -nome: String
+    -descricao: Text
+    -categoria_pai: Integer
+}
 
-    class Funcionario {
-        -nome: String
-        -cpf: String
-        -email: String
-        -telefone: String
-        -cargo: String
-        -data_contratacao: Date
-        -status: String
-    }
+class Usuario {
+    -nome: String
+    -cpf: String
+    -email: String
+    -telefone: String
+    -endereco: String
+    -data_nascimento: Date
+    -tipo_usuario: String
+    -status: String
+}
 
-    class Emprestimo {
-        -data_emprestimo: Date
-        -data_devolucao_prevista: Date
-        -data_devolucao_efetiva: Date
-        -status: String
-        -observacoes: Text
-    }
+class Funcionario {
+    -nome: String
+    -cpf: String
+    -email: String
+    -telefone: String
+    -cargo: String
+    -data_contratacao: Date
+    -status: String
+}
 
-    class Reserva {
-        -data_reserva: Date
-        -data_limite: Date
-        -status: String
-        -prioridade: Integer
-    }
+class Emprestimo {
+    -data_emprestimo: Date
+    -data_devolucao_prevista: Date
+    -data_devolucao_efetiva: Date
+    -status: String
+    -observacoes: Text
+}
 
-    class Multa {
-        -valor: Decimal
-        -data_geracao: Date
-        -status: String
-        -motivo: String
-    }
+class Reserva {
+    -data_reserva: Date
+    -data_limite: Date
+    -status: String
+    -prioridade: Integer
+}
 
-    class Pagamento {
-        -valor: Decimal
-        -data_pagamento: Date
-        -forma_pagamento: String
-        -comprovante: String
-    }
+class Multa {
+    -valor: Decimal
+    -data_geracao: Date
+    -status: String
+    -motivo: String
+}
 
-    class Evento {
-        -nome: String
-        -descricao: Text
-        -data_inicio: Date
-        -data_fim: Date
-        -capacidade: Integer
-        -tipo_evento: String
-        -status: String
-    }
+class Pagamento {
+    -valor: Decimal
+    -data_pagamento: Date
+    -forma_pagamento: String
+    -comprovante: String
+}
 
-    class Sala {
-        -nome: String
-        -capacidade: Integer
-        -tipo: String
-        -status: String
-        -equipamentos: Text
-    }
+class Evento {
+    -nome: String
+    -descricao: Text
+    -data_inicio: Date
+    -data_fim: Date
+    -capacidade: Integer
+    -tipo_evento: String
+    -status: String
+}
 
-    class ReservaSala {
-        -data_inicio: Date
-        -data_fim: Date
-        -finalidade: String
-        -status: String
-    }
+class Sala {
+    -nome: String
+    -capacidade: Integer
+    -tipo: String
+    -status: String
+    -equipamentos: Text
+}
 
-    class Fornecedor {
-        -nome: String
-        -cnpj: String
-        -endereco: String
-        -telefone: String
-        -email: String
-        -tipo_fornecedor: String
-    }
+class ReservaSala {
+    -data_inicio: Date
+    -data_fim: Date
+    -finalidade: String
+    -status: String
+}
 
-    class Aquisicao {
-        -data_pedido: Date
-        -data_chegada: Date
-        -valor_total: Decimal
-        -status: String
-        -nota_fiscal: String
-    }
+class Fornecedor {
+    -nome: String
+    -cnpj: String
+    -endereco: String
+    -telefone: String
+    -email: String
+    -tipo_fornecedor: String
+}
 
-    Livro "1" -- "0..*" Exemplar
-    Livro "1" -- "0..*" AcervoDigital
-    Livro "1..*" -- "1..*" Autor
-    Livro "1..*" -- "1" Editora
-    Livro "1..*" -- "1..*" Categoria
-    Exemplar "1" -- "0..*" Emprestimo
-    Usuario "1" -- "0..*" Emprestimo
-    Usuario "1" -- "0..*" Reserva
-    Usuario "1" -- "0..*" Multa
-    Multa "1" -- "0..1" Pagamento
-    Usuario "1" -- "0..*" ReservaSala
-    Sala "1" -- "0..*" ReservaSala
-    Fornecedor "1" -- "0..*" Aquisicao
-    Funcionario "1" -- "0..*" Emprestimo
-    Funcionario "1" -- "0..*" Evento
+class Aquisicao {
+    -data_pedido: Date
+    -data_chegada: Date
+    -valor_total: Decimal
+    -status: String
+    -nota_fiscal: String
+}
+
+class LivroAutor {
+    -livro_id: Integer
+    -autor_id: Integer
+}
+
+class LivroCategoria {
+    -livro_id: Integer
+    -categoria_id: Integer
+}
+
+Livro "1" -- "0..*" Exemplar
+Livro "1" -- "0..*" AcervoDigital
+Livro "1" -- "*" LivroAutor
+Autor "1" -- "*" LivroAutor
+Livro "1..*" -- "1" Editora
+Livro "1" -- "*" LivroCategoria
+Categoria "1" -- "*" LivroCategoria
+Exemplar "1" -- "0..*" Emp
 
 @enduml
