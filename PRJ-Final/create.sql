@@ -55,7 +55,7 @@ CREATE TABLE usuario (
     endereco VARCHAR,
     data_nascimento DATE,
     tipo_usuario VARCHAR,
-    status VARCHAR
+    'status' VARCHAR
 );
 
 CREATE TABLE funcionario (
@@ -74,7 +74,7 @@ CREATE TABLE emprestimo (
     data_emprestimo DATE NOT NULL,
     data_devolucao_prevista DATE,
     data_devolucao_efetiva DATE,
-    status VARCHAR NOT NULL,
+    'status' VARCHAR NOT NULL,
     observacoes TEXT,
     codigo_exemplar UUID,
     cpf_usuario VARCHAR,
@@ -86,9 +86,11 @@ CREATE TABLE reserva (
     id SERIAL PRIMARY KEY,
     data_reserva DATE NOT NULL,
     data_limite DATE,
-    status VARCHAR NOT NULL,
+    'status' VARCHAR NOT NULL,
     prioridade INTEGER,
     cpf_usuario VARCHAR,
+    codigo_exemplar UUID,
+    FOREIGN KEY (codigo_exemplar) REFERENCES exemplar(codigo),
     FOREIGN KEY (cpf_usuario) REFERENCES usuario(cpf)
 );
 
@@ -98,8 +100,10 @@ CREATE TABLE multa (
     data_geracao DATE NOT NULL,
     'status' VARCHAR NOT NULL,
     motivo VARCHAR,
-    id_reserva INTEGER,
-    FOREIGN KEY (id_reserva) REFERENCES reserva(id)
+    cpf_usuario VARCHAR,
+    id_emprestimo INTEGER,
+    FOREIGN KEY (cpf_usuario) REFERENCES usuario(cpf),
+    FOREIGN KEY (id_emprestimo) REFERENCES emprestimo(id)
 );
 
 CREATE TABLE pagamento (
