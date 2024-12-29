@@ -6,11 +6,11 @@ CREATE OR REPLACE FUNCTION renovar_emprestimo(
 ) RETURNS DATE AS $$
 DECLARE
     v_emprestimo_id INTEGER;
+    v_livro_id INTEGER;
     v_nova_data_devolucao DATE;
-    v_tem_reserva BOOLEAN;
 BEGIN
-    -- Verifica se existe algum empréstimo ativo
-    SELECT e.id INTO v_emprestimo_id
+    -- Verificar se existe empréstimo ativo
+    SELECT e.id, ex.livro_id INTO v_emprestimo_id, v_livro_id
     FROM emprestimo e
     JOIN exemplar ex ON e.exemplar_id = ex.id
     JOIN usuario u ON e.usuario_id = u.id
@@ -22,16 +22,13 @@ BEGIN
         RAISE EXCEPTION 'Empréstimo não encontrado';
     END IF;
     
-    -- Verifica se existe reserva pro livro
-    SELECT EXISTS (
+    -- Verificar se existe reserva para o livro
+    IF EXISTS (
         SELECT 1
         FROM reserva r
-        JOIN exemplar ex ON ex.livro_id = r.livro_id
-        WHERE ex.codigo = p_exemplar_codigo
+        WHERE r.livro_id = v_livro_id
         AND r.status = 'ATIVA'
-    ) INTO v_tem_reserva;
-    
-    IF v_tem_reserva THEN
+    ) THEN
         RAISE EXCEPTION 'Não é possível renovar. Existe uma reserva para este livro.';
     END IF;
     
@@ -41,3 +38,7 @@ BEGIN
     UPDATE emprestimo SET
         data_devolucao_prevista = v_nova_data_devolucao
     WHERE id = v_emprestimo_id;
+    
+    RETURN v_nova_data_devolucao;
+END;
+$$ LANGUAGE plpgsql;

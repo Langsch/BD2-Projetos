@@ -1,4 +1,4 @@
--- Função pra devolução
+-- Função praa realizar devolução e gerar multa se necessário
 CREATE OR REPLACE FUNCTION realizar_devolucao(
     p_exemplar_codigo VARCHAR,
     p_usuario_cpf VARCHAR
@@ -6,11 +6,13 @@ CREATE OR REPLACE FUNCTION realizar_devolucao(
 DECLARE
     v_exemplar_id INTEGER;
     v_emprestimo_id INTEGER;
+    v_usuario_id INTEGER;
     v_dias_atraso INTEGER;
     v_valor_multa DECIMAL;
 BEGIN
-    -- Localizar o empréstimo ativo
-    SELECT e.id, e.exemplar_id INTO v_emprestimo_id, v_exemplar_id
+    -- Localizar empréstimo ativo
+    SELECT e.id, e.exemplar_id, e.usuario_id 
+    INTO v_emprestimo_id, v_exemplar_id, v_usuario_id
     FROM emprestimo e
     JOIN exemplar ex ON e.exemplar_id = ex.id
     JOIN usuario u ON e.usuario_id = u.id
@@ -22,7 +24,7 @@ BEGIN
         RAISE EXCEPTION 'Empréstimo não encontrado';
     END IF;
     
-    -- Calcular os dias de atraso
+    -- Calcular dias de atraso
     SELECT GREATEST(0, CURRENT_DATE - data_devolucao_prevista) INTO v_dias_atraso
     FROM emprestimo
     WHERE id = v_emprestimo_id;
@@ -33,10 +35,10 @@ BEGIN
         status = 'DEVOLVIDO'
     WHERE id = v_emprestimo_id;
     
-    -- Atualizar o status do exemplar
+    -- Atualizar status do exemplar
     UPDATE exemplar SET status = 'DISPONÍVEL' WHERE id = v_exemplar_id;
     
-    -- Gerar multa caso necessário
+    -- Gerar multa se necessário
     IF v_dias_atraso > 0 THEN
         v_valor_multa := v_dias_atraso * 2.00; -- R$ 2,00 por dia de atraso
         
@@ -47,7 +49,7 @@ BEGIN
             status,
             motivo
         ) VALUES (
-            (SELECT usuario_id FROM emprestimo WHERE id = v_emprestimo_id),
+            v_usuario_id,
             v_valor_multa,
             CURRENT_DATE,
             'PENDENTE',
