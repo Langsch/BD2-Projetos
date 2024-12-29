@@ -178,14 +178,29 @@ class LivroCategoria {
     -id_categoria: Integer
 }
 
+
 Livro "1" -- "0..*" Exemplar
 Livro "1" -- "0..*" AcervoDigital
 Livro "1" -- "*" LivroAutor
-Autor "1" -- "*" LivroAutor
 Livro "1..*" -- "1" Editora
 Livro "1" -- "*" LivroCategoria
+Autor "1" -- "*" LivroAutor
 Categoria "1" -- "*" LivroCategoria
-Exemplar "1" -- "0..*" Emp
+Exemplar "1" -- "0..*" Emprestimo
+Usuario "1" -- "0..*" Emprestimo
+Usuario "1" -- "0..*" Reserva
+Usuario "1" -- "0..*" Multa
+Multa "1" -- "0..1" Pagamento
+Usuario "1" -- "0..*" ReservaSala
+Funcionario "1" -- "0..*" Aquisicao
+Funcionario "1" -- "0..*" ReservaSala
+Emprestimo "1" -- "0..*" Multa
+Reserva "1" -- "0..1" Exemplar
+ReservaSala "1" -- "1" Sala
+Pagamento "1" -- "1" Multa
+Aquisicao "1" -- "*" Fornecedor
+Evento "1" -- "1" Funcionario
 
 
+hide circle
 @enduml

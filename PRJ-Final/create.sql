@@ -2,6 +2,7 @@
 CREATE TABLE livro (
     isbn VARCHAR PRIMARY KEY NOT NULL,
     titulo VARCHAR NOT NULL,
+    editora_id INTEGER,
     ano_publicacao DATE,
     edicao VARCHAR,
     idioma VARCHAR,
@@ -9,6 +10,7 @@ CREATE TABLE livro (
     formato VARCHAR,
     sinopse TEXT,
     capa_url VARCHAR
+    FOREIGN KEY (editora_id) REFERENCES editora(id)
 );
 
 CREATE TABLE exemplar (
