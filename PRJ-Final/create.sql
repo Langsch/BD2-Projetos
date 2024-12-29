@@ -1,196 +1,197 @@
 -- Criação do banco de dados e das tabelas
 CREATE TABLE livro (
-    id SERIAL PRIMARY KEY,
-    isbn VARCHAR(255) NOT NULL,
-    titulo VARCHAR(255) NOT NULL,
+    isbn VARCHAR PRIMARY KEY NOT NULL,
+    titulo VARCHAR NOT NULL,
     ano_publicacao DATE,
-    edicao VARCHAR(255),
-    idioma VARCHAR(255),
+    edicao VARCHAR,
+    idioma VARCHAR,
     num_paginas INTEGER,
-    formato VARCHAR(255),
+    formato VARCHAR,
     sinopse TEXT,
-    capa_url VARCHAR(255)
-);
-
-CREATE TABLE acervo_digital (
-    id SERIAL PRIMARY KEY,
-    titulo VARCHAR(255) NOT NULL,
-    formato VARCHAR(255),
-    url VARCHAR(255),
-    tamanho INTEGER,
-    licenca VARCHAR(255),
-    requisitos TEXT,
-    livro_id INTEGER REFERENCES livro(id)
+    capa_url VARCHAR
 );
 
 CREATE TABLE exemplar (
-    id SERIAL PRIMARY KEY,
-    codigo VARCHAR(255) NOT NULL,
-    status VARCHAR(255),
+    codigo UUID PRIMARY KEY NOT NULL,
+    'status' VARCHAR NOT NULL,
     data_aquisicao DATE,
-    condicao VARCHAR(255),
-    localizacao VARCHAR(255),
-    tipo_aquisicao VARCHAR(255),
-    livro_id INTEGER REFERENCES livro(id)
+    condicao VARCHAR,
+    localizacao VARCHAR,
+    tipo_aquisicao VARCHAR,
+    isbn VARCHAR,
+    FOREIGN KEY (isbn) REFERENCES livro(isbn)
 );
 
 CREATE TABLE autor (
     id SERIAL PRIMARY KEY,
-    nome VARCHAR(255) NOT NULL,
+    nome VARCHAR NOT NULL,
     biografia TEXT,
     data_nascimento DATE,
-    nacionalidade VARCHAR(255),
-    pseudonimo VARCHAR(255)
+    nacionalidade VARCHAR,
+    pseudonimo VARCHAR
 );
 
 CREATE TABLE editora (
     id SERIAL PRIMARY KEY,
-    nome VARCHAR(255) NOT NULL,
-    cnpj VARCHAR(255),
-    endereco VARCHAR(255),
-    telefone VARCHAR(255),
-    email VARCHAR(255),
-    website VARCHAR(255)
+    nome VARCHAR NOT NULL,
+    cnpj VARCHAR NOT NULL,
+    endereco VARCHAR,
+    telefone VARCHAR,
+    email VARCHAR,
+    website VARCHAR
 );
 
 CREATE TABLE categoria (
     id SERIAL PRIMARY KEY,
-    nome VARCHAR(255) NOT NULL,
+    nome VARCHAR NOT NULL,
     descricao TEXT,
-    categoria_pai INTEGER
 );
 
 CREATE TABLE usuario (
-    id SERIAL PRIMARY KEY,
-    nome VARCHAR(255) NOT NULL,
-    cpf VARCHAR(255),
-    email VARCHAR(255),
-    telefone VARCHAR(255),
-    endereco VARCHAR(255),
+    cpf VARCHAR PRIMARY KEY NOT NULL,
+    nome VARCHAR NOT NULL,
+    email VARCHAR,
+    telefone VARCHAR,
+    endereco VARCHAR,
     data_nascimento DATE,
-    tipo_usuario VARCHAR(255),
-    status VARCHAR(255)
+    tipo_usuario VARCHAR,
+    status VARCHAR
 );
 
 CREATE TABLE funcionario (
     id SERIAL PRIMARY KEY,
-    nome VARCHAR(255) NOT NULL,
-    cpf VARCHAR(255),
-    email VARCHAR(255),
-    telefone VARCHAR(255),
-    cargo VARCHAR(255),
+    nome VARCHAR NOT NULL,
+    cpf VARCHAR NOT NULL,
+    email VARCHAR,
+    telefone VARCHAR,
+    cargo VARCHAR,
     data_contratacao DATE,
-    status VARCHAR(255)
+    'status' VARCHAR
 );
 
 CREATE TABLE emprestimo (
     id SERIAL PRIMARY KEY,
-    data_emprestimo DATE,
+    data_emprestimo DATE NOT NULL,
     data_devolucao_prevista DATE,
     data_devolucao_efetiva DATE,
-    status VARCHAR(255),
+    status VARCHAR NOT NULL,
     observacoes TEXT,
-    exemplar_id INTEGER REFERENCES exemplar(id),
-    usuario_id INTEGER REFERENCES usuario(id),
-    funcionario_id INTEGER REFERENCES funcionario(id)
+    codigo_exemplar UUID,
+    cpf_usuario VARCHAR,
+    FOREIGN KEY (codigo_exemplar) REFERENCES exemplar(codigo),
+    FOREIGN KEY (cpf_usuario) REFERENCES usuario(cpf)
 );
 
 CREATE TABLE reserva (
     id SERIAL PRIMARY KEY,
-    data_reserva DATE,
+    data_reserva DATE NOT NULL,
     data_limite DATE,
-    status VARCHAR(255),
+    status VARCHAR NOT NULL,
     prioridade INTEGER,
-    usuario_id INTEGER REFERENCES usuario(id),
-    livro_id INTEGER REFERENCES livro(id)
+    cpf_usuario VARCHAR,
+    FOREIGN KEY (cpf_usuario) REFERENCES usuario(cpf)
 );
 
 CREATE TABLE multa (
     id SERIAL PRIMARY KEY,
-    valor DECIMAL,
-    data_geracao DATE,
-    status VARCHAR(255),
-    motivo VARCHAR(255),
-    usuario_id INTEGER REFERENCES usuario(id)
+    valor DECIMAL(10, 2) NOT NULL,
+    data_geracao DATE NOT NULL,
+    'status' VARCHAR NOT NULL,
+    motivo VARCHAR,
+    id_reserva INTEGER,
+    FOREIGN KEY (id_reserva) REFERENCES reserva(id)
 );
 
 CREATE TABLE pagamento (
     id SERIAL PRIMARY KEY,
-    valor DECIMAL,
-    data_pagamento DATE,
-    forma_pagamento VARCHAR(255),
-    comprovante VARCHAR(255),
-    multa_id INTEGER REFERENCES multa(id)
+    valor DECIMAL(10, 2) NOT NULL,
+    data_pagamento DATE NOT NULL,
+    forma_pagamento VARCHAR,
+    comprovante VARCHAR,
+    id_multa INTEGER,
+    FOREIGN KEY (id_multa) REFERENCES multa(id)
 );
 
 CREATE TABLE evento (
     id SERIAL PRIMARY KEY,
-    nome VARCHAR(255) NOT NULL,
+    nome VARCHAR NOT NULL,
     descricao TEXT,
-    data_inicio DATE,
+    data_inicio DATE NOT NULL,
     data_fim DATE,
     capacidade INTEGER,
-    tipo_evento VARCHAR(255),
-    status VARCHAR(255),
-    funcionario_id INTEGER REFERENCES funcionario(id)
+    tipo_evento VARCHAR,
+    'status' VARCHAR,
+    id_funcionario VARCHAR,
+    FOREIGN KEY (id_funcionario) REFERENCES funcionario(id)
 );
 
 CREATE TABLE sala (
     id SERIAL PRIMARY KEY,
-    nome VARCHAR(255) NOT NULL,
+    nome VARCHAR NOT NULL,
     capacidade INTEGER,
-    tipo VARCHAR(255),
-    status VARCHAR(255),
+    tipo VARCHAR,
+    'status' VARCHAR,
     equipamentos TEXT
 );
 
 CREATE TABLE reserva_sala (
     id SERIAL PRIMARY KEY,
-    data_inicio DATE,
+    data_inicio DATE NOT NULL,
     data_fim DATE,
-    finalidade VARCHAR(255),
-    status VARCHAR(255),
-    sala_id INTEGER REFERENCES sala(id),
-    usuario_id INTEGER REFERENCES usuario(id)
+    finalidade VARCHAR,
+    'status' VARCHAR,
+    cpf_usuario VARCHAR,
+    id_sala INTEGER,
+    FOREIGN KEY (cpf_usuario) REFERENCES usuario(cpf),
+    FOREIGN KEY (id_sala) REFERENCES sala(id)
+);
+
+CREATE TABLE acervo_digital (
+    id SERIAL PRIMARY KEY,
+    isbn VARCHAR,
+    titulo VARCHAR NOT NULL,
+    formato VARCHAR,
+    'url' VARCHAR,
+    tamanho INTEGER,
+    FOREIGN KEY (isbn) REFERENCES livro(isbn)
 );
 
 CREATE TABLE fornecedor (
-    id SERIAL PRIMARY KEY,
-    nome VARCHAR(255) NOT NULL,
-    cnpj VARCHAR(255),
-    endereco VARCHAR(255),
-    telefone VARCHAR(255),
-    email VARCHAR(255),
-    tipo_fornecedor VARCHAR(255)
+    cnpj VARCHAR PRIMARY KEY NOT NULL,
+    nome VARCHAR NOT NULL,
+    endereco VARCHAR,
+    telefone VARCHAR,
+    email VARCHAR,
+    tipo_fornecedor VARCHAR
 );
 
 CREATE TABLE aquisicao (
     id SERIAL PRIMARY KEY,
-    data_pedido DATE,
+    data_pedido DATE NOT NULL,
     data_chegada DATE,
-    valor_total DECIMAL,
-    status VARCHAR(255),
-    nota_fiscal VARCHAR(255),
-    fornecedor_id INTEGER REFERENCES fornecedor(id)
+    valor_total DECIMAL(10, 2) NOT NULL,
+    'status' VARCHAR NOT NULL,
+    nota_fiscal VARCHAR,
+    cnpj_fornecedor VARCHAR,
+    FOREIGN KEY (cnpj_fornecedor) REFERENCES fornecedor(cnpj)
 );
+
 
 -- Tabelas de relacionamentos many-to-many
 CREATE TABLE livro_autor (
-    livro_id INTEGER REFERENCES livro(id),
-    autor_id INTEGER REFERENCES autor(id),
-    PRIMARY KEY (livro_id, autor_id)
+    isbn_livro VARCHAR REFERENCES livro(isbn),
+    id_autor INTEGER REFERENCES autor(id),
 );
 
 CREATE TABLE livro_categoria (
-    livro_id INTEGER REFERENCES livro(id),
-    categoria_id INTEGER REFERENCES categoria(id),
-    PRIMARY KEY (livro_id, categoria_id)
+    isbn_livro VARCHAR REFERENCES livro(isbn),
+    id_categoria INTEGER REFERENCES categoria(id),
 );
-
 
 
 -- Índices para otimização
 CREATE INDEX idx_livro_isbn ON livro(isbn);
 CREATE INDEX idx_exemplar_codigo ON exemplar(codigo);
 CREATE INDEX idx_usuario_cpf ON usuario(cpf);
-CREATE INDEX idx_funcionario_cpf ON funcionario(cpf);
+CREATE INDEX idx_funcionario ON funcionario(id);
+CREATE INDEX idx_reserva_cpf_usuario ON reserva(cpf_usuario);
