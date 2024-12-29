@@ -1,4 +1,4 @@
-@startuml
+@startuml Biblioteca
     class Livro {
         -ISBN: String
         -titulo: String
@@ -9,6 +9,15 @@
         -formato: String
         -sinopse: Text
         -capa_url: String
+    }
+
+    class AcervoDigital {
+        -titulo: String
+        -formato: String
+        -url: String
+        -tamanho: Integer
+        -licenca: String
+        -requisitos: Text
     }
 
     class Exemplar {
@@ -118,15 +127,6 @@
         -status: String
     }
 
-    class AcervoDigital {
-        -titulo: String
-        -formato: String
-        -url: String
-        -tamanho: Integer
-        -licenca: String
-        -requisitos: Text
-    }
-
     class Fornecedor {
         -nome: String
         -cnpj: String
@@ -145,6 +145,7 @@
     }
 
     Livro "1" -- "0..*" Exemplar
+    Livro "1" -- "0..*" AcervoDigital
     Livro "1..*" -- "1..*" Autor
     Livro "1..*" -- "1" Editora
     Livro "1..*" -- "1..*" Categoria

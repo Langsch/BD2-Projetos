@@ -1,6 +1,7 @@
 # Documentação do Sistema de Biblioteca
 
 ## 1. Visão Geral
+
 O sistema de biblioteca foi projetado para gerenciar todos os aspectos de uma biblioteca moderna, incluindo acervo físico e digital, usuários, empréstimos, eventos e espaços físicos.
 
 ## 2. Modelo Conceitual
@@ -8,8 +9,9 @@ O sistema de biblioteca foi projetado para gerenciar todos os aspectos de uma bi
 ### 2.1 Principais Entidades
 
 #### 2.1.1 Livro
+
 - Representa a obra em si (conceito abstrato)
-- Atributos principais:
+- Atributos:
   - ISBN (identificador único)
   - Título
   - Ano de publicação
@@ -21,8 +23,9 @@ O sistema de biblioteca foi projetado para gerenciar todos os aspectos de uma bi
   - URL da capa
 
 #### 2.1.2 Exemplar
+
 - Representa uma cópia física de um livro
-- Atributos principais:
+- Atributos:
   - Código único
   - Status (Disponível/Emprestado/Manutenção/Extraviado)
   - Data de aquisição
@@ -31,8 +34,9 @@ O sistema de biblioteca foi projetado para gerenciar todos os aspectos de uma bi
   - Tipo de aquisição
 
 #### 2.1.3 Autor
+
 - Dados dos autores das obras
-- Atributos principais:
+- Atributos:
   - Nome
   - Biografia
   - Data de nascimento
@@ -40,8 +44,9 @@ O sistema de biblioteca foi projetado para gerenciar todos os aspectos de uma bi
   - Pseudônimo
 
 #### 2.1.4 Usuário
+
 - Representa os leitores cadastrados
-- Atributos principais:
+- Atributos:
   - Nome
   - CPF
   - Email
@@ -52,8 +57,9 @@ O sistema de biblioteca foi projetado para gerenciar todos os aspectos de uma bi
   - Status
 
 #### 2.1.5 Funcionário
+
 - Membros da equipe da biblioteca
-- Atributos principais:
+- Atributos:
   - Nome
   - CPF
   - Email
@@ -62,21 +68,25 @@ O sistema de biblioteca foi projetado para gerenciar todos os aspectos de uma bi
   - Data de contratação
   - Status
 
-### 2.2 Relacionamentos Principais
+### 2.2 Principais Relacionamentos
 
 #### 2.2.1 Livro-Exemplar (1:N)
+
 - Um livro pode ter múltiplos exemplares
 - Cada exemplar pertence a um único livro
 
 #### 2.2.2 Livro-Autor (N:M)
+
 - Um livro pode ter vários autores
 - Um autor pode ter escrito vários livros
 
 #### 2.2.3 Empréstimo (Exemplar-Usuário) (N:M)
+
 - Um usuário pode emprestar vários exemplares
 - Um exemplar pode ser emprestado por vários usuários (em momentos diferentes)
 
 #### 2.2.4 Reserva (Livro-Usuário) (N:M)
+
 - Usuários podem reservar livros
 - Livros podem ter múltiplas reservas
 
@@ -85,6 +95,7 @@ O sistema de biblioteca foi projetado para gerenciar todos os aspectos de uma bi
 ### 3.1 Tabelas Principais
 
 #### 3.1.1 livros
+
 ``` sql
 CREATE TABLE livros (
     livro_id SERIAL PRIMARY KEY,
@@ -100,12 +111,15 @@ CREATE TABLE livros (
     capa_url VARCHAR(255)
 );
 ```
+
 - Chave primária: livro_id
 - Chave estrangeira: editora_id → editoras(editora_id)
 - Índices: isbn (UNIQUE), titulo (para busca)
 
 ---
+
 #### 3.1.2 exemplares
+
 ``` sql
 CREATE TABLE exemplares (
     exemplar_id SERIAL PRIMARY KEY,
@@ -118,9 +132,11 @@ CREATE TABLE exemplares (
     localizacao VARCHAR(50)
 );
 ```
+
 - Chave primária: exemplar_id
 - Chave estrangeira: livro_id → livros(livro_id)
 - Constraints: status (CHECK)
+
 ---
 
 ### 3.2 Tabelas de Relacionamento
@@ -134,11 +150,12 @@ CREATE TABLE autor_livro (
     tipo_autoria VARCHAR(30),
     PRIMARY KEY (autor_id, livro_id)
 );
-``` 
+```
+
 - Chave primária composta: (autor_id, livro_id)
 - Chaves estrangeiras:
-    - autor_id → autores(autor_id)
-    - livro_id → livros(livro_id)
+  - autor_id → autores(autor_id)
+  - livro_id → livros(livro_id)
 
 ### 3.3 Tabelas de Controle
 
@@ -156,26 +173,31 @@ CREATE TABLE emprestimos (
     status VARCHAR(20) CHECK (status IN ('ATIVO', 'DEVOLVIDO', 'ATRASADO'))
 );
 ```
+
 - Controle temporal através de data_emprestimo e data_devolucao_prevista
 - Status permite rastreamento do estado atual do empréstimo
 
 ### 3.4 Decisões de Design
 
 #### Separação entre Livro e Exemplar
+
 - Permite melhor controle do acervo físico
 - Facilita gestão de múltiplas cópias
 - Possibilita rastreamento individual de cada item
 
 #### Uso de SERIAL para IDs
+
 - Autoincremento automático
 - Garante unicidade
 - Melhor performance em índices
 
 #### Timestamps de Controle
+
 - created_at e updated_at em todas as tabelas
 - Facilita auditoria e rastreamento de mudanças
 
 #### Constraints de Validação
+
 - CHECK constraints para status
 - NOT NULL para campos obrigatórios
 - UNIQUE para campos que não podem duplicar
