@@ -1,181 +1,196 @@
-CREATE TABLE Livro (
-    ISBN VARCHAR PRIMARY KEY NOT NULL,
-    titulo VARCHAR NOT NULL,
-    ano_publicacao DATE,
-    edicao VARCHAR,
-    idioma VARCHAR,
-    num_paginas INTEGER,
-    formato VARCHAR,
-    sinopse TEXT,
-    capa_url VARCHAR
-);
-
-CREATE TABLE Exemplar (
-    codigo VARCHAR PRIMARY KEY NOT NULL,
-    status VARCHAR NOT NULL,
-    data_aquisicao DATE,
-    condicao VARCHAR,
-    localizacao VARCHAR,
-    tipo_aquisicao VARCHAR,
-    ISBN VARCHAR,
-    FOREIGN KEY (ISBN) REFERENCES Livro(ISBN)
-);
-
-CREATE TABLE Autor (
+-- Criação do banco de dados e das tabelas
+CREATE TABLE livro (
     id SERIAL PRIMARY KEY,
-    nome VARCHAR NOT NULL,
+    isbn VARCHAR(255) NOT NULL,
+    titulo VARCHAR(255) NOT NULL,
+    ano_publicacao DATE,
+    edicao VARCHAR(255),
+    idioma VARCHAR(255),
+    num_paginas INTEGER,
+    formato VARCHAR(255),
+    sinopse TEXT,
+    capa_url VARCHAR(255)
+);
+
+CREATE TABLE acervo_digital (
+    id SERIAL PRIMARY KEY,
+    titulo VARCHAR(255) NOT NULL,
+    formato VARCHAR(255),
+    url VARCHAR(255),
+    tamanho INTEGER,
+    licenca VARCHAR(255),
+    requisitos TEXT,
+    livro_id INTEGER REFERENCES livro(id)
+);
+
+CREATE TABLE exemplar (
+    id SERIAL PRIMARY KEY,
+    codigo VARCHAR(255) NOT NULL,
+    status VARCHAR(255),
+    data_aquisicao DATE,
+    condicao VARCHAR(255),
+    localizacao VARCHAR(255),
+    tipo_aquisicao VARCHAR(255),
+    livro_id INTEGER REFERENCES livro(id)
+);
+
+CREATE TABLE autor (
+    id SERIAL PRIMARY KEY,
+    nome VARCHAR(255) NOT NULL,
     biografia TEXT,
     data_nascimento DATE,
-    nacionalidade VARCHAR,
-    pseudonimo VARCHAR
+    nacionalidade VARCHAR(255),
+    pseudonimo VARCHAR(255)
 );
 
-CREATE TABLE Editora (
+CREATE TABLE editora (
     id SERIAL PRIMARY KEY,
-    nome VARCHAR NOT NULL,
-    cnpj VARCHAR NOT NULL,
-    endereco VARCHAR,
-    telefone VARCHAR,
-    email VARCHAR,
-    website VARCHAR
+    nome VARCHAR(255) NOT NULL,
+    cnpj VARCHAR(255),
+    endereco VARCHAR(255),
+    telefone VARCHAR(255),
+    email VARCHAR(255),
+    website VARCHAR(255)
 );
 
-CREATE TABLE Categoria (
+CREATE TABLE categoria (
     id SERIAL PRIMARY KEY,
-    nome VARCHAR NOT NULL,
+    nome VARCHAR(255) NOT NULL,
     descricao TEXT,
     categoria_pai INTEGER
 );
 
-CREATE TABLE Usuario (
+CREATE TABLE usuario (
     id SERIAL PRIMARY KEY,
-    nome VARCHAR NOT NULL,
-    cpf VARCHAR NOT NULL,
-    email VARCHAR,
-    telefone VARCHAR,
-    endereco VARCHAR,
+    nome VARCHAR(255) NOT NULL,
+    cpf VARCHAR(255),
+    email VARCHAR(255),
+    telefone VARCHAR(255),
+    endereco VARCHAR(255),
     data_nascimento DATE,
-    tipo_usuario VARCHAR,
-    status VARCHAR
+    tipo_usuario VARCHAR(255),
+    status VARCHAR(255)
 );
 
-CREATE TABLE Funcionario (
+CREATE TABLE funcionario (
     id SERIAL PRIMARY KEY,
-    nome VARCHAR NOT NULL,
-    cpf VARCHAR NOT NULL,
-    email VARCHAR,
-    telefone VARCHAR,
-    cargo VARCHAR,
+    nome VARCHAR(255) NOT NULL,
+    cpf VARCHAR(255),
+    email VARCHAR(255),
+    telefone VARCHAR(255),
+    cargo VARCHAR(255),
     data_contratacao DATE,
-    status VARCHAR
+    status VARCHAR(255)
 );
 
-CREATE TABLE Emprestimo (
+CREATE TABLE emprestimo (
     id SERIAL PRIMARY KEY,
-    data_emprestimo DATE NOT NULL,
+    data_emprestimo DATE,
     data_devolucao_prevista DATE,
     data_devolucao_efetiva DATE,
-    status VARCHAR NOT NULL,
+    status VARCHAR(255),
     observacoes TEXT,
-    codigo_exemplar VARCHAR,
-    cpf_usuario VARCHAR,
-    FOREIGN KEY (codigo_exemplar) REFERENCES Exemplar(codigo),
-    FOREIGN KEY (cpf_usuario) REFERENCES Usuario(cpf)
+    exemplar_id INTEGER REFERENCES exemplar(id),
+    usuario_id INTEGER REFERENCES usuario(id),
+    funcionario_id INTEGER REFERENCES funcionario(id)
 );
 
-CREATE TABLE Reserva (
+CREATE TABLE reserva (
     id SERIAL PRIMARY KEY,
-    data_reserva DATE NOT NULL,
+    data_reserva DATE,
     data_limite DATE,
-    status VARCHAR NOT NULL,
+    status VARCHAR(255),
     prioridade INTEGER,
-    cpf_usuario VARCHAR,
-    FOREIGN KEY (cpf_usuario) REFERENCES Usuario(cpf)
+    usuario_id INTEGER REFERENCES usuario(id),
+    livro_id INTEGER REFERENCES livro(id)
 );
 
-CREATE TABLE Multa (
+CREATE TABLE multa (
     id SERIAL PRIMARY KEY,
-    valor DECIMAL(10, 2) NOT NULL,
-    data_geracao DATE NOT NULL,
-    status VARCHAR NOT NULL,
-    motivo VARCHAR,
-    id_reserva INTEGER,
-    FOREIGN KEY (id_reserva) REFERENCES Reserva(id)
+    valor DECIMAL,
+    data_geracao DATE,
+    status VARCHAR(255),
+    motivo VARCHAR(255),
+    usuario_id INTEGER REFERENCES usuario(id)
 );
 
-CREATE TABLE Pagamento (
+CREATE TABLE pagamento (
     id SERIAL PRIMARY KEY,
-    valor DECIMAL(10, 2) NOT NULL,
-    data_pagamento DATE NOT NULL,
-    forma_pagamento VARCHAR,
-    comprovante VARCHAR,
-    id_multa INTEGER,
-    FOREIGN KEY (id_multa) REFERENCES Multa(id)
+    valor DECIMAL,
+    data_pagamento DATE,
+    forma_pagamento VARCHAR(255),
+    comprovante VARCHAR(255),
+    multa_id INTEGER REFERENCES multa(id)
 );
 
-CREATE TABLE Evento (
+CREATE TABLE evento (
     id SERIAL PRIMARY KEY,
-    nome VARCHAR NOT NULL,
+    nome VARCHAR(255) NOT NULL,
     descricao TEXT,
-    data_inicio DATE NOT NULL,
+    data_inicio DATE,
     data_fim DATE,
     capacidade INTEGER,
-    tipo_evento VARCHAR,
-    status VARCHAR,
-    cpf_funcionario VARCHAR,
-    FOREIGN KEY (cpf_funcionario) REFERENCES Funcionario(cpf)
+    tipo_evento VARCHAR(255),
+    status VARCHAR(255),
+    funcionario_id INTEGER REFERENCES funcionario(id)
 );
 
-CREATE TABLE Sala (
+CREATE TABLE sala (
     id SERIAL PRIMARY KEY,
-    nome VARCHAR NOT NULL,
+    nome VARCHAR(255) NOT NULL,
     capacidade INTEGER,
-    tipo VARCHAR,
-    status VARCHAR,
+    tipo VARCHAR(255),
+    status VARCHAR(255),
     equipamentos TEXT
 );
 
-CREATE TABLE ReservaSala (
+CREATE TABLE reserva_sala (
     id SERIAL PRIMARY KEY,
-    data_inicio DATE NOT NULL,
+    data_inicio DATE,
     data_fim DATE,
-    finalidade VARCHAR,
-    status VARCHAR,
-    cpf_usuario VARCHAR,
-    FOREIGN KEY (cpf_usuario) REFERENCES Usuario(cpf),
-    id_sala INTEGER,
-    FOREIGN KEY (id_sala) REFERENCES Sala(id)
+    finalidade VARCHAR(255),
+    status VARCHAR(255),
+    sala_id INTEGER REFERENCES sala(id),
+    usuario_id INTEGER REFERENCES usuario(id)
 );
 
-CREATE TABLE AcervoDigital (
+CREATE TABLE fornecedor (
     id SERIAL PRIMARY KEY,
-    titulo VARCHAR NOT NULL,
-    formato VARCHAR,
-    url VARCHAR,
-    tamanho INTEGER,
-    licenca VARCHAR,
-    requisitos TEXT,
-    ISBN VARCHAR,
-    FOREIGN KEY (ISBN) REFERENCES Livro(ISBN)
+    nome VARCHAR(255) NOT NULL,
+    cnpj VARCHAR(255),
+    endereco VARCHAR(255),
+    telefone VARCHAR(255),
+    email VARCHAR(255),
+    tipo_fornecedor VARCHAR(255)
 );
 
-CREATE TABLE Fornecedor (
+CREATE TABLE aquisicao (
     id SERIAL PRIMARY KEY,
-    nome VARCHAR NOT NULL,
-    cnpj VARCHAR NOT NULL,
-    endereco VARCHAR,
-    telefone VARCHAR,
-    email VARCHAR,
-    tipo_fornecedor VARCHAR
-);
-
-CREATE TABLE Aquisicao (
-    id SERIAL PRIMARY KEY,
-    data_pedido DATE NOT NULL,
+    data_pedido DATE,
     data_chegada DATE,
-    valor_total DECIMAL(10, 2) NOT NULL,
-    status VARCHAR NOT NULL,
-    nota_fiscal VARCHAR,
-    cnpj_fornecedor VARCHAR,
-    FOREIGN KEY (cnpj_fornecedor) REFERENCES Fornecedor(cnpj)
+    valor_total DECIMAL,
+    status VARCHAR(255),
+    nota_fiscal VARCHAR(255),
+    fornecedor_id INTEGER REFERENCES fornecedor(id)
 );
+
+-- Tabelas de relacionamentos many-to-many
+CREATE TABLE livro_autor (
+    livro_id INTEGER REFERENCES livro(id),
+    autor_id INTEGER REFERENCES autor(id),
+    PRIMARY KEY (livro_id, autor_id)
+);
+
+CREATE TABLE livro_categoria (
+    livro_id INTEGER REFERENCES livro(id),
+    categoria_id INTEGER REFERENCES categoria(id),
+    PRIMARY KEY (livro_id, categoria_id)
+);
+
+
+
+-- Índices para otimização
+CREATE INDEX idx_livro_isbn ON livro(isbn);
+CREATE INDEX idx_exemplar_codigo ON exemplar(codigo);
+CREATE INDEX idx_usuario_cpf ON usuario(cpf);
+CREATE INDEX idx_funcionario_cpf ON funcionario(cpf);
