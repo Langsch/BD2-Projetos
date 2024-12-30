@@ -23,7 +23,7 @@ class AcervoDigital {
 
 class Exemplar {
     -codigo: uuid
-    -status: String
+    -status: String [DISPONÍVEL, EMPRESTADO, EM_MANUTENÇÃO, EXTRAVIADO]
     -data_aquisicao: Date
     -condicao: String
     -localizacao: String

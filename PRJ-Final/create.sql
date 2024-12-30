@@ -15,7 +15,7 @@ CREATE TABLE livro (
 
 CREATE TABLE exemplar (
     codigo UUID PRIMARY KEY NOT NULL,
-    'status' VARCHAR NOT NULL,
+    'status' VARCHAR NOT NULL CHECK (status IN ('DISPONÍVEL', 'EMPRESTADO', 'EM_MANUTENÇÃO', 'EXTRAVIADO')),
     data_aquisicao DATE,
     condicao VARCHAR,
     localizacao VARCHAR,
