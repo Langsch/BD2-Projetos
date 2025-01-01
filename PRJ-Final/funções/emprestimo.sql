@@ -1,49 +1,65 @@
 -- Função para realizar um empréstimo
 CREATE OR REPLACE FUNCTION realizar_emprestimo(
-    p_exemplar_codigo VARCHAR,
-    p_usuario_cpf VARCHAR,
-    p_funcionario_cpf VARCHAR,
-    p_dias_emprestimo INTEGER
-) RETURNS INTEGER AS $$
+    p_codigo_exemplar UUID,
+    p_cpf_usuario VARCHAR
+) RETURNS VARCHAR AS $$
 DECLARE
-    v_exemplar_id INTEGER;
-    v_usuario_id INTEGER;
-    v_funcionario_id INTEGER;
-    v_emprestimo_id INTEGER;
+    v_disponivel BOOLEAN;
+    v_tem_multa BOOLEAN;
+    v_qtd_emprestimos INTEGER;
 BEGIN
-    -- Verificar se o exemplar está disponível
-    SELECT id INTO v_exemplar_id
-    FROM exemplar
-    WHERE codigo = p_exemplar_codigo AND status = 'DISPONÍVEL';
-    
-    IF v_exemplar_id IS NULL THEN
-        RAISE EXCEPTION 'Exemplar não disponível ou não encontrado';
+    -- Verificar se exemplar está disponível
+    SELECT status = 'DISPONÍVEL' 
+    INTO v_disponivel
+    FROM exemplar 
+    WHERE codigo = p_codigo_exemplar;
+
+    IF NOT v_disponivel THEN
+        RETURN 'Exemplar não está disponível para empréstimo.';
     END IF;
-    
-    -- Obter os ids
-    SELECT id INTO v_usuario_id FROM usuario WHERE cpf = p_usuario_cpf;
-    SELECT id INTO v_funcionario_id FROM funcionario WHERE cpf = p_funcionario_cpf;
-    
-    -- Inserir o empréstimo
+
+    -- Verificar se usuário tem multas pendentes
+    SELECT EXISTS(
+        SELECT 1 FROM multa 
+        WHERE cpf_usuario = p_cpf_usuario 
+        AND status = 'PENDENTE'
+    ) INTO v_tem_multa;
+
+    IF v_tem_multa THEN
+        RETURN 'Usuário possui multas pendentes.';
+    END IF;
+
+    -- Verificar quantidade de empréstimos ativos do usuário
+    SELECT COUNT(*) 
+    INTO v_qtd_emprestimos
+    FROM emprestimo 
+    WHERE cpf_usuario = p_cpf_usuario 
+    AND status = 'ATIVO';
+
+    IF v_qtd_emprestimos >= 3 THEN
+        RETURN 'Usuário já atingiu o limite de empréstimos simultâneos.';
+    END IF;
+
+    -- Realizar o empréstimo
     INSERT INTO emprestimo (
-        exemplar_id,
-        usuario_id,
-        funcionario_id,
         data_emprestimo,
         data_devolucao_prevista,
-        status
+        status,
+        codigo_exemplar,
+        cpf_usuario
     ) VALUES (
-        v_exemplar_id,
-        v_usuario_id,
-        v_funcionario_id,
         CURRENT_DATE,
-        CURRENT_DATE + p_dias_emprestimo,
-        'ATIVO'
-    ) RETURNING id INTO v_emprestimo_id;
-    
-    -- Atualizar o status do exemplar
-    UPDATE exemplar SET status = 'EMPRESTADO' WHERE id = v_exemplar_id;
-    
-    RETURN v_emprestimo_id;
+        CURRENT_DATE + 7,
+        'ATIVO',
+        p_codigo_exemplar,
+        p_cpf_usuario
+    );
+
+    -- Atualizar status do exemplar
+    UPDATE exemplar 
+    SET status = 'EMPRESTADO'
+    WHERE codigo = p_codigo_exemplar;
+
+    RETURN 'Empréstimo realizado com sucesso.';
 END;
 $$ LANGUAGE plpgsql;

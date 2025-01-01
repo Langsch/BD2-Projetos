@@ -1,64 +1,57 @@
 -- Função praa realizar devolução e gerar multa se necessário
 CREATE OR REPLACE FUNCTION realizar_devolucao(
-    p_exemplar_codigo VARCHAR,
-    p_usuario_cpf VARCHAR
-) RETURNS DECIMAL AS $$
+    p_codigo_exemplar UUID,
+    p_cpf_usuario VARCHAR
+) RETURNS TABLE (
+    mensagem VARCHAR,
+    valor_multa DECIMAL(10,2)
+) AS $$
 DECLARE
-    v_exemplar_id INTEGER;
     v_emprestimo_id INTEGER;
-    v_usuario_id INTEGER;
+    v_data_prevista DATE;
     v_dias_atraso INTEGER;
-    v_valor_multa DECIMAL;
+    v_valor_multa DECIMAL(10,2) := 0;
+    v_multa_id INTEGER;
 BEGIN
-    -- Localizar empréstimo ativo
-    SELECT e.id, e.exemplar_id, e.usuario_id 
-    INTO v_emprestimo_id, v_exemplar_id, v_usuario_id
-    FROM emprestimo e
-    JOIN exemplar ex ON e.exemplar_id = ex.id
-    JOIN usuario u ON e.usuario_id = u.id
-    WHERE ex.codigo = p_exemplar_codigo 
-    AND u.cpf = p_usuario_cpf 
-    AND e.status = 'ATIVO';
-    
-    IF v_emprestimo_id IS NULL THEN
-        RAISE EXCEPTION 'Empréstimo não encontrado';
+    -- Buscar o empréstimo ativo
+    SELECT id, data_devolucao_prevista 
+    INTO v_emprestimo_id, v_data_prevista
+    FROM emprestimo 
+    WHERE codigo_exemplar = p_codigo_exemplar 
+    AND cpf_usuario = p_cpf_usuario 
+    AND status = 'ATIVO';
+
+    IF NOT FOUND THEN
+        RETURN QUERY SELECT 'Empréstimo não encontrado'::VARCHAR, 0::DECIMAL;
+        RETURN;
     END IF;
-    
+
     -- Calcular dias de atraso
-    SELECT GREATEST(0, CURRENT_DATE - data_devolucao_prevista) INTO v_dias_atraso
-    FROM emprestimo
-    WHERE id = v_emprestimo_id;
-    
-    -- Registrar devolução
-    UPDATE emprestimo SET
-        data_devolucao_efetiva = CURRENT_DATE,
-        status = 'DEVOLVIDO'
-    WHERE id = v_emprestimo_id;
-    
-    -- Atualizar status do exemplar
-    UPDATE exemplar SET status = 'DISPONÍVEL' WHERE id = v_exemplar_id;
-    
-    -- Gerar multa se necessário
-    IF v_dias_atraso > 0 THEN
+    IF CURRENT_DATE > v_data_prevista THEN
+        v_dias_atraso := CURRENT_DATE - v_data_prevista;
         v_valor_multa := v_dias_atraso * 2.00; -- R$ 2,00 por dia de atraso
-        
-        INSERT INTO multa (
-            usuario_id,
-            valor,
-            data_geracao,
-            status,
-            motivo
-        ) VALUES (
-            v_usuario_id,
-            v_valor_multa,
-            CURRENT_DATE,
-            'PENDENTE',
-            'Atraso na devolução - ' || v_dias_atraso || ' dias'
-        );
-        
-        RETURN v_valor_multa;
+
+        -- Gerar multa
+        INSERT INTO multa (valor, data_geracao, status, motivo, cpf_usuario, id_emprestimo)
+        VALUES (v_valor_multa, CURRENT_DATE, 'PENDENTE', 'Atraso na devolução', p_cpf_usuario, v_emprestimo_id)
+        RETURNING id INTO v_multa_id;
     END IF;
-    
-    RETURN 0;
+
+    -- Atualizar status do empréstimo e do exemplar
+    UPDATE emprestimo 
+    SET status = 'FINALIZADO',
+        data_devolucao_efetiva = CURRENT_DATE
+    WHERE id = v_emprestimo_id;
+
+    UPDATE exemplar 
+    SET status = 'DISPONÍVEL'
+    WHERE codigo = p_codigo_exemplar;
+
+    RETURN QUERY SELECT 
+        CASE 
+            WHEN v_valor_multa > 0 THEN 'Devolução realizada com multa'
+            ELSE 'Devolução realizada com sucesso'
+        END,
+        v_valor_multa;
 END;
 $$ LANGUAGE plpgsql;
