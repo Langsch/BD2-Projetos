@@ -1,0 +1,18 @@
+-- Trigger para verificar se já existe uma multa pendente para um empréstimo
+
+CREATE OR REPLACE FUNCTION public.tg_verificar_multa_duplicada()
+ RETURNS trigger
+ LANGUAGE plpgsql
+AS $function$
+BEGIN
+    IF EXISTS (
+        SELECT 1 FROM multa 
+        WHERE id_emprestimo = NEW.id_emprestimo 
+        AND status = 'PENDENTE'
+    ) THEN
+        RAISE EXCEPTION 'Já existe uma multa pendente para este empréstimo';
+    END IF;
+    RETURN NEW;
+END;
+$function$
+;
