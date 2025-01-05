@@ -1,13 +1,8 @@
 -- Função pra gerar relatório dos empréstimos p/ período
-CREATE OR REPLACE FUNCTION relatorio_emprestimos(
-    p_data_inicio DATE,
-    p_data_fim DATE
-) RETURNS TABLE (
-    total_emprestimos INTEGER,
-    media_diaria DECIMAL(10,2),
-    total_atrasos INTEGER,
-    valor_multas DECIMAL(10,2)
-) AS $$
+CREATE OR REPLACE FUNCTION public.fn_relatorio_emprestimos(p_data_inicio date, p_data_fim date)
+ RETURNS TABLE(total_emprestimos integer, media_diaria numeric, total_atrasos integer, valor_multas numeric)
+ LANGUAGE plpgsql
+AS $function$
 BEGIN
     RETURN QUERY
     WITH emprestimos_periodo AS (
@@ -23,4 +18,5 @@ BEGIN
     FROM emprestimos_periodo e
     LEFT JOIN multa m ON e.id = m.id_emprestimo;
 END;
-$$ LANGUAGE plpgsql;
+$function$
+;

@@ -1,12 +1,12 @@
--- Função praa renovar o empréstimo
-CREATE OR REPLACE FUNCTION renovar_emprestimo(
-    p_codigo_exemplar UUID,
-    p_cpf_usuario VARCHAR
-) RETURNS VARCHAR AS $$
+-- Função para renovar o empréstimo
+CREATE OR REPLACE FUNCTION public.fn_renovar_emprestimo(p_codigo_exemplar uuid, p_cpf_usuario character varying)
+ RETURNS character varying
+ LANGUAGE plpgsql
+AS $function$
 DECLARE
     v_tem_reserva BOOLEAN;
     v_tem_multa BOOLEAN;
-    v_nova_data DATE;g
+    v_nova_data DATE;
 BEGIN
     -- Verificar se há reservas para o exemplar
     SELECT EXISTS(
@@ -47,4 +47,5 @@ BEGIN
 
     RETURN 'Empréstimo renovado com sucesso. Nova data de devolução: ' || v_nova_data::VARCHAR;
 END;
-$$ LANGUAGE plpgsql;
+$function$
+;

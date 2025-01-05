@@ -1,8 +1,8 @@
 -- Função para realizar um empréstimo
-CREATE OR REPLACE FUNCTION realizar_emprestimo(
-    p_codigo_exemplar UUID,
-    p_cpf_usuario VARCHAR
-) RETURNS VARCHAR AS $$
+CREATE OR REPLACE FUNCTION public.fn_realizar_emprestimo(p_codigo_exemplar uuid, p_cpf_usuario character varying)
+ RETURNS character varying
+ LANGUAGE plpgsql
+AS $function$
 DECLARE
     v_disponivel BOOLEAN;
     v_tem_multa BOOLEAN;
@@ -62,4 +62,5 @@ BEGIN
 
     RETURN 'Empréstimo realizado com sucesso.';
 END;
-$$ LANGUAGE plpgsql;
+$function$
+;
