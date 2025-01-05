@@ -1,45 +1,43 @@
 -- Vendas mensais
-CREATE VIEW Vendas_Mensais AS
-SELECT 
-    DATE_TRUNC('month', data_venda) AS mes,
-    SUM(total_venda) AS total_mensal
-FROM Vendas
-GROUP BY DATE_TRUNC('month', data_venda)
-ORDER BY mes;
+CREATE VIEW Vendas_mensais AS
+	SELECT 
+		DATE_PART('Month', data_venda) AS mes,
+		SUM(total_venda) AS "Total de vendas"
+	FROM Vendas
+	GROUP BY mes;
 
 
 -- Funcionarios TI
 CREATE VIEW Funcionarios_TI AS
-SELECT 
-    id_funcionario,
-    nome,
-    salario
-FROM Funcionarios
-WHERE departamento = 'TI' 
-AND salario > 5000
-ORDER BY salario DESC;
+	SELECT 
+		id_funcionario,
+		nome,
+		salario
+	FROM Funcionarios 
+	WHERE departamento LIKE 'Tecnologia da Informação (TI)' AND salario > 5000;
 
 
 -- Pedidos Clientes
 CREATE VIEW Pedidos_Clientes AS
-SELECT 
-    p.id_pedido,
-    p.data_pedido,
-    c.nome_cliente
-FROM Pedidos p
-INNER JOIN Clientes c ON p.id_cliente = c.id_cliente
-ORDER BY p.data_pedido DESC;
+	SELECT 
+		id_pedido,
+		data_pedido,
+		nome_cliente
+	FROM 
+		Clientes c,
+		Pedidos p
+	WHERE c.id_cliente = p.id_cliente
+	GROUP BY 1, 3
+	ORDER BY 3;
 
 
 -- Preco medio categorias
-CREATE VIEW Preco_Medio_Categorias AS
-SELECT 
-    categoria,
-    ROUND(AVG(preco), 2) AS media_preco
-FROM Produtos
-GROUP BY categoria
-ORDER BY media_preco DESC;
-
+CREATE VIEW Preco_Medio_Cateogira AS
+	SELECT
+		categoria,
+		ROUND(AVG(preco), 2)
+	FROM Produtos
+	GROUP BY 1;
 
 -- Ranking Vendas
 CREATE VIEW Ranking_Vendas AS
