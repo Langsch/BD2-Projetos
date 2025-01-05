@@ -10,6 +10,7 @@ class Livro {
     -formato: String
     -sinopse: Text
     -capa_url: String
+    -editora_id: Integer
 }
 
 class AcervoDigital {
