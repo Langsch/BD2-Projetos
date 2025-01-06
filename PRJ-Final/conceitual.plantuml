@@ -107,7 +107,7 @@ class Multa {
     -status: String
     -motivo: String
     -cpf_usuario: String
-    -id_emprestimo: Serial
+    -id_emprestimo: Integer
 }
 
 class Pagamento {
@@ -128,7 +128,7 @@ class Evento {
     -capacidade: Integer
     -tipo_evento: String
     -status: String
-    -id_funcionario: Serial
+    -id_funcionario: Integer
 }
 
 class Sala {
@@ -147,7 +147,7 @@ class ReservaSala {
     -finalidade: String
     -status: String
     -cpf_usuario: String
-    -id_sala: Serial
+    -id_sala: Integer
 }
 
 class Fornecedor {
