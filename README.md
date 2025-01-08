@@ -15,3 +15,22 @@ O objetivo deste repositório é fornecer um local centralizado para armazenar e
 ## Contribuição
 
 Se você é um integrante do grupo de Banco de Dados II e deseja contribuir com projetos ou melhorar os existentes, por favor, sinta-se à vontade para fazer um pull request ou abrir uma issue.
+
+<hr>
+
+<h1 align="center">Documentação do Projeto Final<h1/>
+
+## Sobre o projeto
+Esse projeto consiste da implementação de um banco de dados voltado para a administração biblioteca/livraria.  
+
+O banco de dados conta com 19 tabelas, 6 funções, 4 triggers, 3 views e 5 índices.
+
+## Tabelas
+
+## Funções 
+
+## Triggers
+
+## Visões
+
+## Índices
