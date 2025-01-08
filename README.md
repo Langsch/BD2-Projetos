@@ -21,7 +21,7 @@ Se você é um integrante do grupo de Banco de Dados II e deseja contribuir com 
 <h1 align="center">Documentação do Projeto Final<h1/>
 
 ## Sobre o projeto
-Esse projeto consiste da implementação de um banco de dados voltado para a administração biblioteca/livraria.  
+Esse projeto consiste da implementação de um banco de dados voltado para a administração de bibliotecas públicas.  
 
 O banco de dados conta com 19 tabelas, 6 funções, 4 triggers, 3 views e 5 índices.
 
