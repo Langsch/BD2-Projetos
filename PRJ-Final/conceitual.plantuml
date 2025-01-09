@@ -31,7 +31,7 @@ class Exemplar {
     -tipo_aquisicao: String
     -isbn: String
 }
-
+  
 class Autor {
     -id: Serial
     -nome: String
