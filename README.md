@@ -184,6 +184,13 @@ O banco de dados conta com 19 tabelas, 6 funções, 4 triggers, 3 views e 5 índ
 A função fn_reservar_sala permite que um usuário ativo realize a reserva de uma sala disponível, verificando as condições e inserindo o registro na tabela de reservas.
 
 ## Triggers
+[`tg_atualizar_tipo_usuario`](PRJ-Final\triggers\tg_atualizar_tipo_usuario.sql): Implementa uma lógica que atualiza o tipo de usuário na tabela `usuario`, com base no número de empréstimos e reservas de sala realizados pelo mesmo.
+
+[`tg_proteger_exemplar_emprestado`](PRJ-Final\triggers\tg_proteger_exemplar_emprestado.sql): Tem como objetivo impedir a exclusão de registros na tabela `exemplar` caso o exemplar possua empréstimos ativos na tabela `emprestimo`.
+
+[`tg_verificar_multa_aplicada`](PRJ-Final\triggers\tg_verificar_multa_duplicada.sql): O objetivo do trigger é evitar a criação de múltiplas multas pendentes para o mesmo empréstimo na tabela multa. Isso garante que cada empréstimo tenha no máximo uma multa com status "PENDENTE".
+
+[`tg_verificar_sobreposicao_reserva`](PRJ-Final\triggers\tg_verificar_sobreposicao_reserva.sql): O objetivo do trigger é evitar que sejam criadas ou atualizadas reservas para uma sala que se sobreponham a outra reserva já ativa no mesmo período. Isso garante que não haja conflitos de agendamento para a mesma sala.
 
 ## Visões
 

@@ -1,6 +1,6 @@
 -- Trigger para verificar se já existe uma multa pendente para um empréstimo
 
-CREATE OR REPLACE FUNCTION public.tg_verificar_multa_duplicada()
+CREATE OR REPLACE FUNCTION public.fn_verificar_multa_duplicada()
  RETURNS trigger
  LANGUAGE plpgsql
 AS $function$
@@ -16,3 +16,8 @@ BEGIN
 END;
 $function$
 ;
+
+CREATE TRIGGER tg_verificar_multa_duplicada
+    BEFORE INSERT ON multa
+    FOR EACH ROW
+    EXECUTE FUNCTION fn_verificar_multa_duplicada();

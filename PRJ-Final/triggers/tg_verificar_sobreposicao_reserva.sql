@@ -1,6 +1,6 @@
 -- Trigger para verificar se já existe uma reserva ativa para a sala no mesmo período
 
-CREATE OR REPLACE FUNCTION public.tg_verificar_sobreposicao_reserva()
+CREATE OR REPLACE FUNCTION public.fn_verificar_sobreposicao_reserva()
  RETURNS trigger
  LANGUAGE plpgsql
 AS $function$
@@ -27,3 +27,8 @@ BEGIN
 END;
 $function$
 ;
+
+CREATE TRIGGER tg_verificar_sobreposicao_reserva
+    BEFORE INSERT OR UPDATE ON reserva_sala
+    FOR EACH ROW
+    EXECUTE FUNCTION fn_verificar_sobreposicao_reserva();

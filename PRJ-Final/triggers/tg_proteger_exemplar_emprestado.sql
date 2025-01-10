@@ -1,6 +1,6 @@
 -- Trigger para proteger a exclusão de exemplares com empréstimos ativos
 
-CREATE OR REPLACE FUNCTION public.tg_proteger_exemplar_emprestado()
+CREATE OR REPLACE FUNCTION public.fn_proteger_exemplar_emprestado()
  RETURNS trigger
  LANGUAGE plpgsql
 AS $function$
@@ -14,5 +14,9 @@ BEGIN
     END IF;
     RETURN OLD;
 END;
-$function$
-;
+$function$;
+
+CREATE TRIGGER tg_proteger_exemplar_emprestado 
+    BEFORE DELETE ON exemplar
+    FOR EACH ROW
+    EXECUTE FUNCTION fn_proteger_exemplar_emprestado();

@@ -1,6 +1,6 @@
 -- Trigger para atualizar o tipo de usuário baseado no número de empréstimos e reservas de sala
 
-CREATE OR REPLACE FUNCTION public.tg_atualizar_tipo_usuario()
+CREATE OR REPLACE FUNCTION public.fn_atualizar_tipo_usuario()
  RETURNS trigger
  LANGUAGE plpgsql
 AS $function$
@@ -43,5 +43,14 @@ BEGIN
 
     RETURN NEW;
 END;
-$function$
-;
+$function$;
+
+CREATE TRIGGER tg_atualizar_tipo_usuario_on_empretimos
+    AFTER INSERT OR UPDATE ON emprestimo
+    FOR EACH STATEMENT
+    EXECUTE FUNCTION fn_atualizar_tipo_usuario;
+
+CREATE TRIGGER tg_atualizar_tipo_usuario_on_reservas
+    AFTER INSERT OR UPDATE ON reserva_sala
+    FOR EACH STATEMENT
+    EXECUTE FUNCTION fn_atualizar_tipo_usuario();
