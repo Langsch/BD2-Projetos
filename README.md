@@ -167,7 +167,21 @@ O banco de dados conta com 19 tabelas, 6 funções, 4 triggers, 3 views e 5 índ
 - Apenas usuários ativos podem reservar salas,     respeitando os horários de funcionamento.
 - Equipamentos adicionais devem ser solicitados previamente.
 
+<hr>
+
 ## Funções 
+[`fn_gerar_relatorio_usuario`](PRJ-Final\funções\fn_gerar_relatorio_usuario.sql): A função fn_gerar_relatorio_usuario é usada para gerar um relatório consolidado com informações de um usuário específico, identificado pelo CPF, sobre empréstimos, multas e reservas. Ela retorna diversas estatísticas organizadas em colunas.
+
+[`fn_realizar_devolução`](PRJ-Final\funções\fn_realizar_devolucao.sql): Localiza o empréstimo ativo, finaliza-o, atualiza o status do exemplar e retorna uma mensagem de sucesso.
+
+[`fn_relatorio_emprestimos`](PRJ-Final\funções\fn_realizar_emprestimo.sql): A função fn_realizar_emprestimo é usada para registrar um novo empréstimo de um exemplar para um usuário, realizando as devidas verificações e atualizando os dados no banco.
+
+[`fn_relatorio_emprestimos`](PRJ-Final\funções\fn_relatorio_emprestimos.sql): A função fn_relatorio_emprestimos gera um relatório detalhado sobre os empréstimos realizados em um período específico. Ela utiliza parâmetros de data de início e fim fornecidos pelo usuário para calcular métricas importantes relacionadas aos empréstimos e multas.
+
+[`fn_renovar_emprestimo`](PRJ-Final\funções\fn_renovar_emprestimo.sql): A função fn_renovar_emprestimo permite que um empréstimo ativo seja renovado, estendendo o prazo de devolução.
+
+[`fn_reservar_sala`](PRJ-Final\funções\fn_reservar_sala.sql): 
+A função fn_reservar_sala permite que um usuário ativo realize a reserva de uma sala disponível, verificando as condições e inserindo o registro na tabela de reservas.
 
 ## Triggers
 
