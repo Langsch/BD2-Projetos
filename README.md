@@ -187,4 +187,10 @@ A função fn_reservar_sala permite que um usuário ativo realize a reserva de u
 
 ## Visões
 
+[`vw_disponibilidade_exemplares`](PRJ-Final\views\vw_disponibilidade_exemplares.sql): A view vw_disponibilidade_exemplares é uma estrutura que fornece uma visão consolidada sobre a disponibilidade dos exemplares de livros, agrupando e organizando informações úteis para gestão de acervo. 
+
+[`vw_historico_exemplar`](PRJ-Final\views\vw_historico_exemplar.sql): Exibe um histórico consolidado dos exemplares, com informações relacionadas ao livro, status atual, datas de aquisição, empréstimos, usuários distintos que o utilizaram e multas geradas.
+
+[`vw_ocupacao_salas`](PRJ-Final\views\vw_ocupacao_salas.sql): A view vw_ocupacao_salas fornece uma visão detalhada sobre a ocupação das salas, incluindo informações sobre a sala, reservas ativas e os usuários que realizaram essas reservas.
+
 ## Índices
