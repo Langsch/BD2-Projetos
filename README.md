@@ -77,7 +77,7 @@ O banco de dados conta com 19 tabelas, 6 funções, 4 triggers, 3 views e 5 índ
 ### 7. Usuario
 - **Finalidade**: Representa os usuários da biblioteca (leitores).  
 - **Atributos principais**:
-  - `cpf`, `nome`, `tipo_usuario`: Identificação e tipo (e.g., estudante, professor).  
+  - `cpf`, `nome`, `tipo_usuario`: Identificação e tipo (heavy/ligh user).  
   - `status`: Atividade do usuário.  
 - **Relacionamentos**:
   - Relaciona-se com `Emprestimo`, `Reserva`, `Multa` e `ReservaSala`.
@@ -98,7 +98,7 @@ O banco de dados conta com 19 tabelas, 6 funções, 4 triggers, 3 views e 5 índ
   - Associado a `Usuario` e `Exemplar`.
 
 ### 10. Reserva
-- **Finalidade**: Representa reservas de exemplares pelos usuários.  
+- **Finalidade**: Representa reservas de exemplares pelos usuários quando os exemplares não estão disponíveis para empréstimo.  
 - **Atributos principais**:
   - `data_reserva`, `data_limite`: Controle de disponibilidade.  
   - `prioridade`: Define ordem de atendimento.  
