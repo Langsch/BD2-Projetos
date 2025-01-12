@@ -7,8 +7,13 @@ FROM aquisicao
 GROUP BY mes;
 	
 -- 2) Consulta todos os livros escritos por autores estrangeiros:
-SELECT *
-FROM livro
+SELECT 
+	li.isbn,
+	li.titulo,
+	li.edicao,
+	li.idioma,
+	li.sinopse
+FROM livro li,
 WHERE isbn NOT IN (
 	SELECT l.isbn 
 	FROM livro l, livro_autor la, autor a
@@ -27,8 +32,8 @@ LIMIT 10;
 
 -- 4) Consulta todos os livros registrados de um determinado autor: 
 SELECT 
-	l.isbn
-	l.titulo
+	l.isbn,
+	l.titulo,
 	l.sinopse 
 FROM livro l, livro_autor la, autor a 
 WHERE l.isbn = la.isbn_livro AND la.id_autor = a.id AND a.nome LIKE 'Machado de Assis';
@@ -36,13 +41,13 @@ WHERE l.isbn = la.isbn_livro AND la.id_autor = a.id AND a.nome LIKE 'Machado de 
 -- 5) Consulta os livros nunca emprestados: 
 SELECT 
 	isbn,
-	titulo,
+	titulo
 FROM livro 
 WHERE isbn NOT IN (
 	SELECT 
 		l.isbn
 	FROM livro l, exemplar e, emprestimo emp
-	WHERE l.isbn = e.isbn AND e.codigo = emp.codigo_exemplar;
+	WHERE l.isbn = e.isbn AND e.codigo = emp.codigo_exemplar
 );
 
 -- 6) Consulta os usuários com multa ativa: 
@@ -51,7 +56,7 @@ SELECT
 	u.email,
 	m.valor 
 FROM usuario u, multa m
-WHERE u.cpf = m.cpf_usuario AND status LIKE 'Ativa'
+WHERE u.cpf = m.cpf_usuario AND m.status LIKE 'PENDENTE';
 
 -- 7) Consulta o valor total de multas do ano, agrupadas pelo mês : 
 SELECT 
@@ -61,7 +66,7 @@ SELECT
 FROM pagamento
 WHERE DATE_PART('Year', data_pagamento) = 2024
 GROUP BY mes
-ORDER BY valor DESC;
+ORDER BY total DESC;
 
 -- 8) Consulta os detalhes dos exemplares reservados:
 SELECT
@@ -71,7 +76,7 @@ SELECT
 	r.status,
 	u.nome
 FROM livro l, exemplar e, reserva r, usuario u 
-WHERE l.isbn = e.isbn AND e.codigo = r.codigo_exemplar AND r.cpf_usuario = u.cpf  
+WHERE l.isbn = e.isbn AND e.codigo = r.codigo_exemplar AND r.cpf_usuario = u.cpf;
 
 -- 9) Consulta as informações de eventos ativos e o contato do funcionario organizador:
 SELECT 
@@ -79,11 +84,13 @@ SELECT
 	e.descricao,
 	e.data_inicio,
 	e.data_fim,
-	f.nome,
+	f.nome AS organizador,
 	f.email,
 	f.telefone
-FROM evento e, funcionario f
-WHERE e.id_funcionario = f.id AND e.data_fim >= CURRENT_DATE;4
+FROM evento e
+JOIN funcionario f
+	ON e.id_funcionario = f.id 
+WHERE e.data_fim >= CURRENT_DATE;
 
 -- 10) Consulta a porcentagem de emprestimos que se convertem em multa por usuário: 
 SELECT 
@@ -92,6 +99,7 @@ SELECT
 	u.telefone,
 	COUNT(e.id) AS qtd_emprestimo,
 	COUNT(m.id) AS qtd_multas, 
-	ROUND(COUNT(qtd_multas) * 100/ qtd_emprestimo::DECIMAL, 2) AS porcentagem_multas
+	ROUND(COUNT(m.id) * 100/ COUNT(e.id)::DECIMAL, 2) AS porcentagem_multas
 FROM usuario u, emprestimo e, multa m
-WHERE u.cpf = e.cpf_usuario AND e.id = m.id_emprestimo;
+WHERE u.cpf = e.cpf_usuario AND e.id = m.id_emprestimo
+GROUP BY 1, 2, 3;
