@@ -45,10 +45,10 @@ BEGIN
 END;
 $function$;
 
-CREATE TRIGGER tg_atualizar_tipo_usuario_on_empretimos
+CREATE TRIGGER tg_atualizar_tipo_usuario_on_emprestimos
     AFTER INSERT OR UPDATE ON emprestimo
     FOR EACH STATEMENT
-    EXECUTE FUNCTION fn_atualizar_tipo_usuario;
+    EXECUTE FUNCTION fn_atualizar_tipo_usuario();
 
 CREATE TRIGGER tg_atualizar_tipo_usuario_on_reservas
     AFTER INSERT OR UPDATE ON reserva_sala
