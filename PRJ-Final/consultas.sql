@@ -5,7 +5,7 @@ SELECT
 	SUM(valor_total) AS total_mes  
 FROM aquisicao
 GROUP BY mes;
-	
+
 -- 2) Consulta todos os livros escritos por autores estrangeiros:
 SELECT 
 	li.isbn,
@@ -75,22 +75,35 @@ SELECT
 	r.data_reserva,
 	r.status,
 	u.nome
-FROM livro l, exemplar e, reserva r, usuario u 
-WHERE l.isbn = e.isbn AND e.codigo = r.codigo_exemplar AND r.cpf_usuario = u.cpf;
+FROM livro l, reserva r, usuario u 
+WHERE l.isbn = e.isbn AND r.cpf_usuario = u.cpf;
 
--- 9) Consulta as informações de eventos ativos e o contato do funcionario organizador:
+-- 9) Consulta que retorna um relatório do usuário mediante o cpf:
 SELECT 
-	e.nome,
-	e.descricao,
-	e.data_inicio,
-	e.data_fim,
-	f.nome AS organizador,
-	f.email,
-	f.telefone
-FROM evento e
-JOIN funcionario f
-	ON e.id_funcionario = f.id 
-WHERE e.data_fim >= CURRENT_DATE;
+        u.nome,
+        u.email,
+        u.tipo_usuario,
+        u.status,       
+        -- Estatísticas de empréstimos
+        COUNT(DISTINCT e.id),
+        COUNT(DISTINCT CASE WHEN e.status = 'ATIVO' THEN e.id END),
+        COUNT(DISTINCT CASE 
+            WHEN e.status = 'ATIVO' 
+            AND e.data_devolucao_prevista < CURRENT_DATE 
+            THEN e.id END),
+        -- Estatísticas de multas
+        COALESCE(SUM(m.valor), 0),
+        COALESCE(SUM(CASE WHEN m.status = 'PENDENTE' THEN m.valor ELSE 0 END), 0),
+        -- Reservas
+        COUNT(DISTINCT CASE WHEN r.status = 'ATIVO' THEN r.id END),
+        COUNT(DISTINCT CASE WHEN rs.status = 'ATIVO' THEN rs.id END)  
+    FROM usuario u,
+    LEFT JOIN emprestimo e ON u.cpf = e.cpf_usuario
+    LEFT JOIN multa m ON e.id = m.id_emprestimo
+    LEFT JOIN reserva r ON u.cpf = r.cpf_usuario
+    LEFT JOIN reserva_sala rs ON u.cpf = rs.cpf_usuario
+    WHERE u.cpf = 'XXX.XXX.XXX-XX'
+    GROUP BY u.cpf, u.nome, u.email, u.tipo_usuario, u.status;
 
 -- 10) Consulta a porcentagem de emprestimos que se convertem em multa por usuário: 
 SELECT 
