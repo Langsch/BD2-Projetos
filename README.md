@@ -173,3 +173,114 @@ O banco de dados conta com 18 tabelas, 6 funções, 4 triggers, 3 views e 5 índ
 [`vw_historico_exemplar`](PRJ-Final\views\vw_historico_exemplar.sql): Exibe um histórico consolidado dos exemplares, com informações relacionadas ao livro, status atual, datas de aquisição, empréstimos, usuários distintos que o utilizaram e multas geradas.
 
 [`vw_ocupacao_salas`](PRJ-Final\views\vw_ocupacao_salas.sql): A view vw_ocupacao_salas fornece uma visão detalhada sobre a ocupação das salas, incluindo informações sobre a sala, reservas ativas e os usuários que realizaram essas reservas.
+
+## Funções
+
+### [`fn_gerar_relatorio_usuario`]
+- **Finalidade**: Gera um relatório consolidado das atividades de um usuário específico.
+- **Parâmetros**: 
+  - `p_cpf`: CPF do usuário
+- **Retorno**: Tabela contendo:
+  - Dados pessoais (nome, email, tipo, status)
+  - Estatísticas de empréstimos (total, ativos, em atraso)
+  - Informações de multas (total e pendentes)
+  - Contagem de reservas (livros e salas)
+- **Uso**: Utilizada para análise do perfil e atividade dos usuários.
+
+### [`fn_realizar_devolucao`]
+- **Finalidade**: Processa a devolução de um exemplar emprestado.
+- **Parâmetros**:
+  - `p_codigo_exemplar`: Código UUID do exemplar
+  - `p_cpf_usuario`: CPF do usuário
+- **Retorno**: Mensagem de status e valor de eventual multa
+- **Operações**:
+  - Atualiza status do exemplar para 'DISPONÍVEL'
+  - Finaliza o empréstimo
+  - Registra data de devolução efetiva
+
+### [`fn_realizar_emprestimo`]
+- **Finalidade**: Realiza o empréstimo de um exemplar para um usuário.
+- **Parâmetros**:
+  - `p_codigo_exemplar`: Código UUID do exemplar
+  - `p_cpf_usuario`: CPF do usuário
+- **Retorno**: Mensagem de status da operação
+- **Verificações**:
+  - Disponibilidade do exemplar
+  - Multas pendentes do usuário
+  - Limite de empréstimos simultâneos (3)
+- **Operações**:
+  - Cria registro de empréstimo
+  - Atualiza status do exemplar
+
+### [`fn_relatorio_emprestimos`]
+- **Finalidade**: Gera relatório estatístico de empréstimos em um período.
+- **Parâmetros**:
+  - `p_data_inicio`: Data inicial
+  - `p_data_fim`: Data final
+- **Retorno**: Estatísticas incluindo:
+  - Total de empréstimos
+  - Média diária
+  - Total de atrasos
+  - Valor total de multas
+
+### [`fn_renovar_emprestimo`]
+- **Finalidade**: Processa a renovação de um empréstimo ativo.
+- **Parâmetros**:
+  - `p_codigo_exemplar`: Código UUID do exemplar
+  - `p_cpf_usuario`: CPF do usuário
+- **Retorno**: Mensagem de status com nova data
+- **Verificações**:
+  - Existência de reservas
+  - Multas pendentes
+- **Operações**:
+  - Estende prazo em 7 dias
+
+### [`fn_reservar_sala`]
+- **Finalidade**: Realiza a reserva de uma sala.
+- **Parâmetros**:
+  - `p_cpf_usuario`: CPF do usuário
+  - `p_id_sala`: ID da sala
+  - `p_data_inicio`: Data/hora início
+  - `p_data_fim`: Data/hora fim
+- **Retorno**: Mensagem de status
+- **Verificações**:
+  - Status do usuário
+  - Disponibilidade da sala
+  - Validade das datas
+
+## Triggers
+
+### [`tg_atualizar_tipo_usuario`]
+- **Finalidade**: Atualiza automaticamente o tipo do usuário baseado em sua atividade.
+- **Eventos**: Após INSERT ou UPDATE em empréstimo e reserva_sala
+- **Operações**:
+  - Conta empréstimos e reservas de sala
+  - Atualiza tipo_usuario baseado em thresholds:
+    * heavy_user_leitor_estudante (≥10 empréstimos e reservas)
+    * heavy_user_leitor (≥10 empréstimos)
+    * heavy_user_estudante (≥10 reservas)
+    * light_user_leitor_estudante
+    * light_user_leitor
+    * light_user_estudante
+    * novo_usuario
+
+### [`tg_proteger_exemplar_emprestado`]
+- **Finalidade**: Impede a exclusão de exemplares com empréstimos ativos.
+- **Evento**: Antes de DELETE em exemplar
+- **Operação**: 
+  - Verifica existência de empréstimos ativos
+  - Bloqueia exclusão se houver
+
+### [`tg_verificar_multa_duplicada`]
+- **Finalidade**: Evita múltiplas multas pendentes para o mesmo empréstimo.
+- **Evento**: Antes de INSERT em multa
+- **Operação**:
+  - Verifica existência de multa pendente
+  - Bloqueia inserção se houver
+
+### [`tg_verificar_sobreposicao_reserva`]
+- **Finalidade**: Previne sobreposição de reservas de salas.
+- **Evento**: Antes de INSERT ou UPDATE em reserva_sala
+- **Operação**:
+  - Verifica existência de reservas no mesmo período
+  - Bloqueia operação se houver sobreposição
