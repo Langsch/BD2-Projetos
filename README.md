@@ -23,20 +23,20 @@ Se você é um integrante do grupo de Banco de Dados II e deseja contribuir com 
 ## Sobre o projeto
 Esse projeto consiste da implementação de um banco de dados voltado para a administração de bibliotecas públicas.  
 
-O banco de dados conta com 19 tabelas, 6 funções, 4 triggers, 3 views e 5 índices.
+O banco de dados conta com 18 tabelas, 6 funções, 4 triggers, 3 views e 5 índices.
 
 <hr>
 
 ## Tabelas e Finalidades
 
 ### 1. Livro
-- **Finalidade**: Representa as informações bibliográficas de um livro.  
+- **Finalidade**: Representa o conceito de um livro no acervo da biblioteca.  
 - **Atributos principais**:
   - `ISBN`: Identificação única.  
   - `titulo`, `ano_publicacao`, `edicao`, `idioma`, `sinopse`: Detalhes sobre o conteúdo.  
   - `editora_id`: Relaciona com a editora responsável pelo livro.  
 - **Relacionamentos**:  
-  - Relaciona-se com `Exemplar`, `AcervoDigital`, `Autor` (via `LivroAutor`), `Categoria` (via `LivroCategoria`).
+  - Relaciona-se com `Exemplar`, `AcervoDigital`, `Autor` (via `LivroAutor`), `Categoria` (via `LivroCategoria`), `Reserva`.
 
 ### 2. Exemplar
 - **Finalidade**: Representa cada cópia física de um livro disponível na biblioteca.  
@@ -45,7 +45,7 @@ O banco de dados conta com 19 tabelas, 6 funções, 4 triggers, 3 views e 5 índ
   - `status`: Disponibilidade do exemplar (e.g., disponível, emprestado).  
   - `data_aquisicao`, `condicao`: Informações de aquisição e estado físico.  
 - **Relacionamentos**:  
-  - Relaciona-se com `Emprestimo` e `Reserva`.
+  - Relaciona-se com `Emprestimo` e `AquisicaoExemplar`.
 
 ### 3. AcervoDigital
 - **Finalidade**: Representa os materiais digitais relacionados a um livro.  
@@ -77,7 +77,7 @@ O banco de dados conta com 19 tabelas, 6 funções, 4 triggers, 3 views e 5 índ
 ### 7. Usuario
 - **Finalidade**: Representa os usuários da biblioteca (leitores).  
 - **Atributos principais**:
-  - `cpf`, `nome`, `tipo_usuario`: Identificação e tipo (heavy/ligh user).  
+  - `cpf`, `nome`, `tipo_usuario`: Identificação e tipo (heavy/light user).  
   - `status`: Atividade do usuário.  
 - **Relacionamentos**:
   - Relaciona-se com `Emprestimo`, `Reserva`, `Multa` e `ReservaSala`.
@@ -87,21 +87,26 @@ O banco de dados conta com 19 tabelas, 6 funções, 4 triggers, 3 views e 5 índ
 - **Atributos principais**:
   - `cargo`, `data_contratacao`, `status`: Informações profissionais.  
 - **Relacionamentos**:
-  - Relaciona-se com `Aquisicao`, `ReservaSala` e `Evento`.
+  - Relaciona-se com `Aquisicao`, `ReservaSala`, `Emprestimo` e `Reserva`.
 
 ### 9. Emprestimo
 - **Finalidade**: Controla os empréstimos de exemplares.  
 - **Atributos principais**:
   - `data_emprestimo`, `data_devolucao_prevista`, `data_devolucao_efetiva`: Controle de prazos.  
   - `status`: Estado do empréstimo (e.g., pendente, concluído).  
+  - `id_funcionario`: Funcionário responsável pela operação.
 - **Relacionamentos**:
-  - Associado a `Usuario` e `Exemplar`.
+  - Associado a `Usuario`, `Exemplar` e `Funcionario`.
 
 ### 10. Reserva
-- **Finalidade**: Representa reservas de exemplares pelos usuários quando os exemplares não estão disponíveis para empréstimo.  
+- **Finalidade**: Representa reservas de livros pelos usuários.  
 - **Atributos principais**:
   - `data_reserva`, `data_limite`: Controle de disponibilidade.  
   - `prioridade`: Define ordem de atendimento.  
+  - `isbn_livro`: Livro que está sendo reservado.
+  - `id_funcionario`: Funcionário responsável pela operação.
+- **Relacionamentos**:
+  - Relaciona-se com `Usuario`, `Livro` e `Funcionario`.
 
 ### 11. Multa
 - **Finalidade**: Gerencia penalidades aplicadas a usuários por atrasos ou danos.  
@@ -115,89 +120,56 @@ O banco de dados conta com 19 tabelas, 6 funções, 4 triggers, 3 views e 5 índ
 - **Atributos principais**:
   - `forma_pagamento`, `comprovante`: Detalhes financeiros.  
 
-### 13. Evento
-- **Finalidade**: Controla eventos promovidos pela biblioteca.  
-- **Atributos principais**:
-  - `nome`, `descricao`, `data_inicio`, `data_fim`: Informações do evento.  
-- **Relacionamentos**:
-  - Organizado por um `Funcionario`.
-
-### 14. Sala
-- **Finalidade**: Gerencia salas disponíveis para atividades ou eventos.  
+### 13. Sala
+- **Finalidade**: Gerencia salas disponíveis para atividades.  
 - **Atributos principais**:
   - `nome`, `capacidade`, `equipamentos`: Características da sala.  
 - **Relacionamentos**:
   - Associada a `ReservaSala`.
 
+### 14. ReservaSala
+- **Finalidade**: Controla as reservas de salas.  
+- **Atributos principais**:
+  - `data_inicio`, `data_fim`: Período da reserva.
+  - `finalidade`: Propósito do uso da sala.
+- **Relacionamentos**:
+  - Associada a `Usuario` e `Sala`.
+
 ### 15. Fornecedor
 - **Finalidade**: Representa fornecedores de materiais.  
 - **Atributos principais**:
   - `cnpj`, `nome`, `tipo_fornecedor`: Identificação e classificação.  
+- **Relacionamentos**:
+  - Relaciona-se com `Aquisicao`.
 
 ### 16. Aquisicao
 - **Finalidade**: Gerencia pedidos de aquisição de materiais.  
 - **Atributos principais**:
   - `data_pedido`, `data_chegada`, `valor_total`: Informações financeiras e de logística.  
+- **Relacionamentos**:
+  - Relaciona-se com `Fornecedor` e `AquisicaoExemplar`.
 
-<hr>
+### 17. AquisicaoExemplar
+- **Finalidade**: Relaciona os exemplares adquiridos com sua aquisição de origem.
+- **Atributos principais**:
+  - `id_aquisicao`: Identificador da aquisição.
+  - `codigo_exemplar`: Identificador do exemplar.
+- **Relacionamentos**:
+  - Conecta `Aquisicao` com `Exemplar`.
 
-## Regras de Negócio
 
-### 1. Empréstimos
-- Um usuário só pode realizar empréstimos se não houver multas pendentes ou exemplares atrasados.
-- O prazo máximo de empréstimo é de 14 dias para usuários comuns, podendo ser maior para professores.
+## Índices
+- `idx_livro_isbn`: Otimiza buscas por ISBN do livro
+- `idx_exemplar_codigo`: Melhora consultas por código do exemplar
+- `idx_usuario_cpf`: Acelera buscas por CPF do usuário
+- `idx_funcionario`: Otimiza consultas envolvendo funcionários
+- `idx_reserva_isbn`: Melhora performance em consultas de reservas por livro
+- `idx_aquisicao_exemplar`: Otimiza buscas de exemplares por aquisição
 
-### 2. Reservas
-- A prioridade de atendimento é definida com base na ordem de solicitação.
-- Uma reserva expira após um prazo pré-definido (e.g., 3 dias úteis) sem retirada.
-
-### 3. Multas
-- Multas são geradas automaticamente para empréstimos atrasados ou exemplares danificados.
-- O pagamento de multas pode ser feito diretamente na biblioteca ou por meios digitais.
-
-### 4. Aquisição de Livros
-- Apenas funcionários autorizados podem registrar aquisições.
-- Cada aquisição deve ter um fornecedor associado com nota fiscal válida.
-
-### 5. Eventos
-- Os eventos devem ser aprovados por um funcionário responsável e registrados no sistema.
-- Cada evento deve ter capacidade máxima definida.
-
-### 6. Reservas de Salas
-- Apenas usuários ativos podem reservar salas,     respeitando os horários de funcionamento.
-- Equipamentos adicionais devem ser solicitados previamente.
-
-<hr>
-
-## Funções 
-[`fn_gerar_relatorio_usuario`](PRJ-Final\funções\fn_gerar_relatorio_usuario.sql): A função fn_gerar_relatorio_usuario é usada para gerar um relatório consolidado com informações de um usuário específico, identificado pelo CPF, sobre empréstimos, multas e reservas. Ela retorna diversas estatísticas organizadas em colunas.
-
-[`fn_realizar_devolução`](PRJ-Final\funções\fn_realizar_devolucao.sql): Localiza o empréstimo ativo, finaliza-o, atualiza o status do exemplar e retorna uma mensagem de sucesso.
-
-[`fn_relatorio_emprestimos`](PRJ-Final\funções\fn_realizar_emprestimo.sql): A função fn_realizar_emprestimo é usada para registrar um novo empréstimo de um exemplar para um usuário, realizando as devidas verificações e atualizando os dados no banco.
-
-[`fn_relatorio_emprestimos`](PRJ-Final\funções\fn_relatorio_emprestimos.sql): A função fn_relatorio_emprestimos gera um relatório detalhado sobre os empréstimos realizados em um período específico. Ela utiliza parâmetros de data de início e fim fornecidos pelo usuário para calcular métricas importantes relacionadas aos empréstimos e multas.
-
-[`fn_renovar_emprestimo`](PRJ-Final\funções\fn_renovar_emprestimo.sql): A função fn_renovar_emprestimo permite que um empréstimo ativo seja renovado, estendendo o prazo de devolução.
-
-[`fn_reservar_sala`](PRJ-Final\funções\fn_reservar_sala.sql): 
-A função fn_reservar_sala permite que um usuário ativo realize a reserva de uma sala disponível, verificando as condições e inserindo o registro na tabela de reservas.
-
-## Triggers
-[`tg_atualizar_tipo_usuario`](PRJ-Final\triggers\tg_atualizar_tipo_usuario.sql): Implementa uma lógica que atualiza o tipo de usuário na tabela `usuario`, com base no número de empréstimos e reservas de sala realizados pelo mesmo.
-
-[`tg_proteger_exemplar_emprestado`](PRJ-Final\triggers\tg_proteger_exemplar_emprestado.sql): Tem como objetivo impedir a exclusão de registros na tabela `exemplar` caso o exemplar possua empréstimos ativos na tabela `emprestimo`.
-
-[`tg_verificar_multa_aplicada`](PRJ-Final\triggers\tg_verificar_multa_duplicada.sql): O objetivo do trigger é evitar a criação de múltiplas multas pendentes para o mesmo empréstimo na tabela multa. Isso garante que cada empréstimo tenha no máximo uma multa com status "PENDENTE".
-
-[`tg_verificar_sobreposicao_reserva`](PRJ-Final\triggers\tg_verificar_sobreposicao_reserva.sql): O objetivo do trigger é evitar que sejam criadas ou atualizadas reservas para uma sala que se sobreponham a outra reserva já ativa no mesmo período. Isso garante que não haja conflitos de agendamento para a mesma sala.
-
-## Visões
+## Views
 
 [`vw_disponibilidade_exemplares`](PRJ-Final\views\vw_disponibilidade_exemplares.sql): A view vw_disponibilidade_exemplares é uma estrutura que fornece uma visão consolidada sobre a disponibilidade dos exemplares de livros, agrupando e organizando informações úteis para gestão de acervo. 
 
 [`vw_historico_exemplar`](PRJ-Final\views\vw_historico_exemplar.sql): Exibe um histórico consolidado dos exemplares, com informações relacionadas ao livro, status atual, datas de aquisição, empréstimos, usuários distintos que o utilizaram e multas geradas.
 
 [`vw_ocupacao_salas`](PRJ-Final\views\vw_ocupacao_salas.sql): A view vw_ocupacao_salas fornece uma visão detalhada sobre a ocupação das salas, incluindo informações sobre a sala, reservas ativas e os usuários que realizaram essas reservas.
-
-## Índices

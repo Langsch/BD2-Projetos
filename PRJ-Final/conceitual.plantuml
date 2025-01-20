@@ -88,6 +88,7 @@ class Emprestimo {
     -observacoes: Text
     -codigo_exemplar: uuid
     -cpf_usuario: String
+    -id_funcionario: Integer
 }
 
 class Reserva {
@@ -97,7 +98,8 @@ class Reserva {
     -status: String
     -prioridade: Integer
     -cpf_usuario: String
-    -codigo_exemplar: uuid
+    -isbn_livro: String
+    -id_funcionario: Integer
 }
 
 class Multa {
@@ -117,18 +119,6 @@ class Pagamento {
     -forma_pagamento: String
     -comprovante: String
     -id_multa: Integer
-}
-
-class Evento {
-    -id: Serial
-    -nome: String
-    -descricao: Text
-    -data_inicio: Date
-    -data_fim: Date
-    -capacidade: Integer
-    -tipo_evento: String
-    -status: String
-    -id_funcionario: Integer
 }
 
 class Sala {
@@ -179,12 +169,17 @@ class LivroCategoria {
     -id_categoria: Integer
 }
 
+class AquisicaoExemplar {
+    -id_aquisicao: Integer
+    -codigo_exemplar: uuid
+}
 
 Livro "1" -- "0..*" Exemplar
 Livro "1" -- "0..*" AcervoDigital
 Livro "1" -- "*" LivroAutor
 Livro "1..*" -- "1" Editora
 Livro "1" -- "*" LivroCategoria
+Livro "1" -- "0..*" Reserva
 Autor "1" -- "*" LivroAutor
 Categoria "1" -- "*" LivroCategoria
 Exemplar "1" -- "0..*" Emprestimo
@@ -193,15 +188,13 @@ Usuario "1" -- "0..*" Reserva
 Usuario "1" -- "0..*" Multa
 Multa "1" -- "0..1" Pagamento
 Usuario "1" -- "0..*" ReservaSala
-Funcionario "1" -- "0..*" Aquisicao
-Funcionario "1" -- "0..*" ReservaSala
 Emprestimo "1" -- "0..*" Multa
-Reserva "1" -- "0..1" Exemplar
 ReservaSala "1" -- "1" Sala
 Pagamento "1" -- "1" Multa
-Aquisicao "1" -- "*" Fornecedor
-Evento "1" -- "1" Funcionario
-
+Aquisicao "1" -- "*" AquisicaoExemplar
+AquisicaoExemplar "*" -- "1" Exemplar
+Funcionario "1" -- "0..*" Emprestimo
+Funcionario "1" -- "0..*" Reserva
 
 hide circle
 @enduml

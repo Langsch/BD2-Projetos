@@ -118,11 +118,13 @@ CREATE TABLE emprestimo (
     observacoes TEXT,
     codigo_exemplar UUID,
     cpf_usuario VARCHAR,
+    id_funcionario INTEGER,
     FOREIGN KEY (codigo_exemplar) REFERENCES exemplar(codigo),
-    FOREIGN KEY (cpf_usuario) REFERENCES usuario(cpf)
+    FOREIGN KEY (cpf_usuario) REFERENCES usuario(cpf),
+    FOREIGN KEY (id_funcionario) REFERENCES funcionario(id)
 );
 
--- Tabela de reservas de exemplares
+-- Tabela de reservas de livros
 CREATE TABLE reserva (
     id SERIAL PRIMARY KEY,
     data_reserva DATE NOT NULL,
@@ -130,9 +132,11 @@ CREATE TABLE reserva (
     status VARCHAR NOT NULL,
     prioridade INTEGER,
     cpf_usuario VARCHAR,
-    codigo_exemplar UUID,
-    FOREIGN KEY (codigo_exemplar) REFERENCES exemplar(codigo),
-    FOREIGN KEY (cpf_usuario) REFERENCES usuario(cpf)
+    isbn_livro VARCHAR,
+    id_funcionario INTEGER,
+    FOREIGN KEY (isbn_livro) REFERENCES livro(isbn),
+    FOREIGN KEY (cpf_usuario) REFERENCES usuario(cpf),
+    FOREIGN KEY (id_funcionario) REFERENCES funcionario(id)
 );
 
 -- Tabela de multas por atraso ou danos
@@ -157,20 +161,6 @@ CREATE TABLE pagamento (
     comprovante VARCHAR,
     id_multa INTEGER,
     FOREIGN KEY (id_multa) REFERENCES multa(id)
-);
-
--- Tabela de eventos realizados na biblioteca
-CREATE TABLE evento (
-    id SERIAL PRIMARY KEY,
-    nome VARCHAR NOT NULL,
-    descricao TEXT,
-    data_inicio DATE NOT NULL,
-    data_fim DATE,
-    capacidade INTEGER,
-    tipo_evento VARCHAR,
-    status VARCHAR,
-    id_funcionario INTEGER,
-    FOREIGN KEY (id_funcionario) REFERENCES funcionario(id)
 );
 
 -- Tabela de reservas de salas
@@ -209,6 +199,13 @@ CREATE TABLE aquisicao (
     FOREIGN KEY (cnpj_fornecedor) REFERENCES fornecedor(cnpj)
 );
 
+-- Tabela que relaciona aquisição com exemplar
+CREATE TABLE aquisicao_exemplar (
+    id_aquisicao INTEGER REFERENCES aquisicao(id),
+    codigo_exemplar UUID REFERENCES exemplar(codigo),
+    PRIMARY KEY (id_aquisicao, codigo_exemplar)
+);
+
 -- =====================================================
 -- Tabelas de relacionamentos many-to-many
 -- =====================================================
@@ -235,4 +232,5 @@ CREATE INDEX idx_livro_isbn ON livro(isbn);
 CREATE INDEX idx_exemplar_codigo ON exemplar(codigo);
 CREATE INDEX idx_usuario_cpf ON usuario(cpf);
 CREATE INDEX idx_funcionario ON funcionario(id);
-CREATE INDEX idx_reserva_cpf_usuario ON reserva(cpf_usuario);
+CREATE INDEX idx_reserva_isbn ON reserva(isbn_livro);
+CREATE INDEX idx_aquisicao_exemplar ON aquisicao_exemplar(id_aquisicao, codigo_exemplar);
