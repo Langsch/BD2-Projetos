@@ -15,3 +15,272 @@ O objetivo deste repositório é fornecer um local centralizado para armazenar e
 ## Contribuição
 
 Se você é um integrante do grupo de Banco de Dados II e deseja contribuir com projetos ou melhorar os existentes, por favor, sinta-se à vontade para fazer um pull request ou abrir uma issue.
+
+<hr>
+
+<h1 align="center">Documentação do Projeto Final<h1/>
+
+## Sobre o projeto
+Esse projeto consiste da implementação de um banco de dados voltado para a administração de bibliotecas públicas.  
+
+O banco de dados conta com 18 tabelas, 6 funções, 4 triggers, 3 views e 5 índices.
+
+<hr>
+
+## Tabelas e Finalidades
+
+### 1. Livro
+- **Finalidade**: Representa o conceito de um livro no acervo da biblioteca.  
+- **Atributos principais**:
+  - `ISBN`: Identificação única.  
+  - `titulo`, `ano_publicacao`, `edicao`, `idioma`, `sinopse`: Detalhes sobre o conteúdo.  
+  - `editora_id`: Relaciona com a editora responsável pelo livro.  
+- **Relacionamentos**:  
+  - Relaciona-se com `Exemplar`, `AcervoDigital`, `Autor` (via `LivroAutor`), `Categoria` (via `LivroCategoria`), `Reserva`.
+
+### 2. Exemplar
+- **Finalidade**: Representa cada cópia física de um livro disponível na biblioteca.  
+- **Atributos principais**:
+  - `codigo`: Identificador único de cada exemplar.  
+  - `status`: Disponibilidade do exemplar (e.g., disponível, emprestado).  
+  - `data_aquisicao`, `condicao`: Informações de aquisição e estado físico.  
+- **Relacionamentos**:  
+  - Relaciona-se com `Emprestimo` e `AquisicaoExemplar`.
+
+### 3. AcervoDigital
+- **Finalidade**: Representa os materiais digitais relacionados a um livro.  
+- **Atributos principais**:
+  - `url`: Endereço para acesso ao material.  
+  - `formato`, `tamanho`: Informações técnicas do arquivo.
+
+### 4. Autor
+- **Finalidade**: Armazena dados sobre os autores dos livros.  
+- **Atributos principais**:
+  - `nome`, `biografia`, `data_nascimento`: Informações pessoais.  
+- **Relacionamentos**:
+  - Associado a livros por meio da tabela `LivroAutor`.
+
+### 5. Editora
+- **Finalidade**: Representa editoras responsáveis pela publicação dos livros.  
+- **Atributos principais**:
+  - `nome`, `cnpj`, `endereco`: Identificação da editora.  
+- **Relacionamentos**:
+  - Cada livro está associado a uma editora.
+
+### 6. Categoria
+- **Finalidade**: Classifica os livros em temas ou gêneros.  
+- **Atributos principais**:
+  - `nome`, `descricao`: Nome e descrição da categoria.  
+- **Relacionamentos**:
+  - Relaciona-se com livros por meio da tabela `LivroCategoria`.
+
+### 7. Usuario
+- **Finalidade**: Representa os usuários da biblioteca (leitores).  
+- **Atributos principais**:
+  - `cpf`, `nome`, `tipo_usuario`: Identificação e tipo (heavy/light user).  
+  - `status`: Atividade do usuário.  
+- **Relacionamentos**:
+  - Relaciona-se com `Emprestimo`, `Reserva`, `Multa` e `ReservaSala`.
+
+### 8. Funcionario
+- **Finalidade**: Representa os funcionários da biblioteca.  
+- **Atributos principais**:
+  - `cargo`, `data_contratacao`, `status`: Informações profissionais.  
+- **Relacionamentos**:
+  - Relaciona-se com `Aquisicao`, `ReservaSala`, `Emprestimo` e `Reserva`.
+
+### 9. Emprestimo
+- **Finalidade**: Controla os empréstimos de exemplares.  
+- **Atributos principais**:
+  - `data_emprestimo`, `data_devolucao_prevista`, `data_devolucao_efetiva`: Controle de prazos.  
+  - `status`: Estado do empréstimo (e.g., pendente, concluído).  
+  - `id_funcionario`: Funcionário responsável pela operação.
+- **Relacionamentos**:
+  - Associado a `Usuario`, `Exemplar` e `Funcionario`.
+
+### 10. Reserva
+- **Finalidade**: Representa reservas de livros pelos usuários.  
+- **Atributos principais**:
+  - `data_reserva`, `data_limite`: Controle de disponibilidade.  
+  - `prioridade`: Define ordem de atendimento.  
+  - `isbn_livro`: Livro que está sendo reservado.
+  - `id_funcionario`: Funcionário responsável pela operação.
+- **Relacionamentos**:
+  - Relaciona-se com `Usuario`, `Livro` e `Funcionario`.
+
+### 11. Multa
+- **Finalidade**: Gerencia penalidades aplicadas a usuários por atrasos ou danos.  
+- **Atributos principais**:
+  - `valor`, `motivo`: Descrição e valor da penalidade.  
+- **Relacionamentos**:
+  - Relaciona-se com `Emprestimo` e `Pagamento`.
+
+### 12. Pagamento
+- **Finalidade**: Registra pagamentos de multas.  
+- **Atributos principais**:
+  - `forma_pagamento`, `comprovante`: Detalhes financeiros.  
+
+### 13. Sala
+- **Finalidade**: Gerencia salas disponíveis para atividades.  
+- **Atributos principais**:
+  - `nome`, `capacidade`, `equipamentos`: Características da sala.  
+- **Relacionamentos**:
+  - Associada a `ReservaSala`.
+
+### 14. ReservaSala
+- **Finalidade**: Controla as reservas de salas.  
+- **Atributos principais**:
+  - `data_inicio`, `data_fim`: Período da reserva.
+  - `finalidade`: Propósito do uso da sala.
+- **Relacionamentos**:
+  - Associada a `Usuario` e `Sala`.
+
+### 15. Fornecedor
+- **Finalidade**: Representa fornecedores de materiais.  
+- **Atributos principais**:
+  - `cnpj`, `nome`, `tipo_fornecedor`: Identificação e classificação.  
+- **Relacionamentos**:
+  - Relaciona-se com `Aquisicao`.
+
+### 16. Aquisicao
+- **Finalidade**: Gerencia pedidos de aquisição de materiais.  
+- **Atributos principais**:
+  - `data_pedido`, `data_chegada`, `valor_total`: Informações financeiras e de logística.  
+- **Relacionamentos**:
+  - Relaciona-se com `Fornecedor` e `AquisicaoExemplar`.
+
+### 17. AquisicaoExemplar
+- **Finalidade**: Relaciona os exemplares adquiridos com sua aquisição de origem.
+- **Atributos principais**:
+  - `id_aquisicao`: Identificador da aquisição.
+  - `codigo_exemplar`: Identificador do exemplar.
+- **Relacionamentos**:
+  - Conecta `Aquisicao` com `Exemplar`.
+
+
+## Índices
+- `idx_livro_isbn`: Otimiza buscas por ISBN do livro
+- `idx_exemplar_codigo`: Melhora consultas por código do exemplar
+- `idx_usuario_cpf`: Acelera buscas por CPF do usuário
+- `idx_funcionario`: Otimiza consultas envolvendo funcionários
+- `idx_reserva_isbn`: Melhora performance em consultas de reservas por livro
+- `idx_aquisicao_exemplar`: Otimiza buscas de exemplares por aquisição
+
+## Views
+
+[`vw_disponibilidade_exemplares`](PRJ-Final\views\vw_disponibilidade_exemplares.sql): A view vw_disponibilidade_exemplares é uma estrutura que fornece uma visão consolidada sobre a disponibilidade dos exemplares de livros, agrupando e organizando informações úteis para gestão de acervo. 
+
+[`vw_historico_exemplar`](PRJ-Final\views\vw_historico_exemplar.sql): Exibe um histórico consolidado dos exemplares, com informações relacionadas ao livro, status atual, datas de aquisição, empréstimos, usuários distintos que o utilizaram e multas geradas.
+
+[`vw_ocupacao_salas`](PRJ-Final\views\vw_ocupacao_salas.sql): A view vw_ocupacao_salas fornece uma visão detalhada sobre a ocupação das salas, incluindo informações sobre a sala, reservas ativas e os usuários que realizaram essas reservas.
+
+## Funções
+
+### [`fn_gerar_relatorio_usuario`]
+- **Finalidade**: Gera um relatório consolidado das atividades de um usuário específico.
+- **Parâmetros**: 
+  - `p_cpf`: CPF do usuário
+- **Retorno**: Tabela contendo:
+  - Dados pessoais (nome, email, tipo, status)
+  - Estatísticas de empréstimos (total, ativos, em atraso)
+  - Informações de multas (total e pendentes)
+  - Contagem de reservas (livros e salas)
+- **Uso**: Utilizada para análise do perfil e atividade dos usuários.
+
+### [`fn_realizar_devolucao`]
+- **Finalidade**: Processa a devolução de um exemplar emprestado.
+- **Parâmetros**:
+  - `p_codigo_exemplar`: Código UUID do exemplar
+  - `p_cpf_usuario`: CPF do usuário
+- **Retorno**: Mensagem de status e valor de eventual multa
+- **Operações**:
+  - Atualiza status do exemplar para 'DISPONÍVEL'
+  - Finaliza o empréstimo
+  - Registra data de devolução efetiva
+
+### [`fn_realizar_emprestimo`]
+- **Finalidade**: Realiza o empréstimo de um exemplar para um usuário.
+- **Parâmetros**:
+  - `p_codigo_exemplar`: Código UUID do exemplar
+  - `p_cpf_usuario`: CPF do usuário
+- **Retorno**: Mensagem de status da operação
+- **Verificações**:
+  - Disponibilidade do exemplar
+  - Multas pendentes do usuário
+  - Limite de empréstimos simultâneos (3)
+- **Operações**:
+  - Cria registro de empréstimo
+  - Atualiza status do exemplar
+
+### [`fn_relatorio_emprestimos`]
+- **Finalidade**: Gera relatório estatístico de empréstimos em um período.
+- **Parâmetros**:
+  - `p_data_inicio`: Data inicial
+  - `p_data_fim`: Data final
+- **Retorno**: Estatísticas incluindo:
+  - Total de empréstimos
+  - Média diária
+  - Total de atrasos
+  - Valor total de multas
+
+### [`fn_renovar_emprestimo`]
+- **Finalidade**: Processa a renovação de um empréstimo ativo.
+- **Parâmetros**:
+  - `p_codigo_exemplar`: Código UUID do exemplar
+  - `p_cpf_usuario`: CPF do usuário
+- **Retorno**: Mensagem de status com nova data
+- **Verificações**:
+  - Existência de reservas
+  - Multas pendentes
+- **Operações**:
+  - Estende prazo em 7 dias
+
+### [`fn_reservar_sala`]
+- **Finalidade**: Realiza a reserva de uma sala.
+- **Parâmetros**:
+  - `p_cpf_usuario`: CPF do usuário
+  - `p_id_sala`: ID da sala
+  - `p_data_inicio`: Data/hora início
+  - `p_data_fim`: Data/hora fim
+- **Retorno**: Mensagem de status
+- **Verificações**:
+  - Status do usuário
+  - Disponibilidade da sala
+  - Validade das datas
+
+## Triggers
+
+### [`tg_atualizar_tipo_usuario`]
+- **Finalidade**: Atualiza automaticamente o tipo do usuário baseado em sua atividade.
+- **Eventos**: Após INSERT ou UPDATE em empréstimo e reserva_sala
+- **Operações**:
+  - Conta empréstimos e reservas de sala
+  - Atualiza tipo_usuario baseado em thresholds:
+    * heavy_user_leitor_estudante (≥10 empréstimos e reservas)
+    * heavy_user_leitor (≥10 empréstimos)
+    * heavy_user_estudante (≥10 reservas)
+    * light_user_leitor_estudante
+    * light_user_leitor
+    * light_user_estudante
+    * novo_usuario
+
+### [`tg_proteger_exemplar_emprestado`]
+- **Finalidade**: Impede a exclusão de exemplares com empréstimos ativos.
+- **Evento**: Antes de DELETE em exemplar
+- **Operação**: 
+  - Verifica existência de empréstimos ativos
+  - Bloqueia exclusão se houver
+
+### [`tg_verificar_multa_duplicada`]
+- **Finalidade**: Evita múltiplas multas pendentes para o mesmo empréstimo.
+- **Evento**: Antes de INSERT em multa
+- **Operação**:
+  - Verifica existência de multa pendente
+  - Bloqueia inserção se houver
+
+### [`tg_verificar_sobreposicao_reserva`]
+- **Finalidade**: Previne sobreposição de reservas de salas.
+- **Evento**: Antes de INSERT ou UPDATE em reserva_sala
+- **Operação**:
+  - Verifica existência de reservas no mesmo período
+  - Bloqueia operação se houver sobreposição

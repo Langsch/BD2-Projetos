@@ -1,0 +1,200 @@
+@startuml Biblioteca
+
+class Livro {
+    -ISBN: String
+    -titulo: String
+    -ano_publicacao: Date
+    -edicao: String
+    -idioma: String
+    -num_paginas: Integer
+    -formato: String
+    -sinopse: Text
+    -capa_url: String
+    -editora_id: Integer
+}
+
+class AcervoDigital {
+    -id: Serial
+    -isbn : String
+    -titulo: String
+    -formato: String
+    -url: String
+    -tamanho: Integer
+}
+
+class Exemplar {
+    -codigo: uuid
+    -status: String [DISPONÍVEL, EMPRESTADO, EM_MANUTENÇÃO, EXTRAVIADO]
+    -data_aquisicao: Date
+    -condicao: String
+    -localizacao: String
+    -tipo_aquisicao: String
+    -isbn: String
+}
+  
+class Autor {
+    -id: Serial
+    -nome: String
+    -biografia: Text
+    -data_nascimento: Date
+    -nacionalidade: String
+    -pseudonimo: String
+}
+
+class Editora {
+    -id: Serial
+    -nome: String
+    -cnpj: String
+    -endereco: String
+    -telefone: String
+    -email: String
+    -website: String
+}
+
+class Categoria {
+    -id: Serial
+    -nome: String
+    -descricao: Text
+}
+
+class Usuario {
+    -cpf: String
+    -nome: String
+    -email: String
+    -telefone: String
+    -endereco: String
+    -data_nascimento: Date
+    -tipo_usuario: String
+    -status: String
+}
+
+class Funcionario {
+    -id: Serial
+    -nome: String
+    -cpf: String
+    -email: String
+    -telefone: String
+    -cargo: String
+    -data_contratacao: Date
+    -status: String
+}
+
+class Emprestimo {
+    -id: Serial
+    -data_emprestimo: Date
+    -data_devolucao_prevista: Date
+    -data_devolucao_efetiva: Date
+    -status: String
+    -observacoes: Text
+    -codigo_exemplar: uuid
+    -cpf_usuario: String
+    -id_funcionario: Integer
+}
+
+class Reserva {
+    -id: Serial
+    -data_reserva: Date
+    -data_limite: Date
+    -status: String
+    -prioridade: Integer
+    -cpf_usuario: String
+    -isbn_livro: String
+    -id_funcionario: Integer
+}
+
+class Multa {
+    -id: Serial
+    -valor: Decimal
+    -data_geracao: Date
+    -status: String
+    -motivo: String
+    -cpf_usuario: String
+    -id_emprestimo: Integer
+}
+
+class Pagamento {
+    -id: Serial
+    -valor: Decimal
+    -data_pagamento: Date
+    -forma_pagamento: String
+    -comprovante: String
+    -id_multa: Integer
+}
+
+class Sala {
+    -id: Serial
+    -nome: String
+    -capacidade: Integer
+    -tipo: String
+    -status: String
+    -equipamentos: Text
+}
+
+class ReservaSala {
+    -id: Serial
+    -data_inicio: Date
+    -data_fim: Date
+    -finalidade: String
+    -status: String
+    -cpf_usuario: String
+    -id_sala: Integer
+}
+
+class Fornecedor {
+    -cnpj: String
+    -nome: String
+    -endereco: String
+    -telefone: String
+    -email: String
+    -tipo_fornecedor: String
+}
+
+class Aquisicao {
+    -id: Serial
+    -data_pedido: Date
+    -data_chegada: Date
+    -valor_total: Decimal
+    -status: String
+    -nota_fiscal: String
+    -cnpj_fornecedor: String
+}
+
+class LivroAutor {
+    -isbn_livro: String
+    -id_autor: Integer
+}
+
+class LivroCategoria {
+    -isbn_livro: String
+    -id_categoria: Integer
+}
+
+class AquisicaoExemplar {
+    -id_aquisicao: Integer
+    -codigo_exemplar: uuid
+}
+
+Livro "1" -- "0..*" Exemplar
+Livro "1" -- "0..*" AcervoDigital
+Livro "1" -- "*" LivroAutor
+Livro "1..*" -- "1" Editora
+Livro "1" -- "*" LivroCategoria
+Livro "1" -- "0..*" Reserva
+Autor "1" -- "*" LivroAutor
+Categoria "1" -- "*" LivroCategoria
+Exemplar "1" -- "0..*" Emprestimo
+Usuario "1" -- "0..*" Emprestimo
+Usuario "1" -- "0..*" Reserva
+Usuario "1" -- "0..*" Multa
+Multa "1" -- "0..1" Pagamento
+Usuario "1" -- "0..*" ReservaSala
+Emprestimo "1" -- "0..*" Multa
+ReservaSala "1" -- "1" Sala
+Pagamento "1" -- "1" Multa
+Aquisicao "1" -- "*" AquisicaoExemplar
+AquisicaoExemplar "*" -- "1" Exemplar
+Funcionario "1" -- "0..*" Emprestimo
+Funcionario "1" -- "0..*" Reserva
+
+hide circle
+@enduml
